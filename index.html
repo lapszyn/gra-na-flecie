@@ -88,6 +88,7 @@ button:disabled{opacity:.5;cursor:default}
 <div><label>Tolerancja: ±<span id="tv">45</span> centów</label><input type="range" id="tol" min="20" max="80" value="45"></div>
 <div><label>Czułość mikrofonu: <span id="sv">średnia</span></label><input type="range" id="sens" min="1" max="10" value="5"></div>
 </div>
+<button id="rs" type="button" style="margin-top:12px">Przywróć domyślne ustawienia</button>
 <p class="sub" style="margin:10px 0 0">Flet sopranowy brzmi o oktawę wyżej niż zapis: C = 523 Hz, D = 587 Hz, E = 659 Hz, F = 698 Hz, G = 784 Hz. Grasz dźwięk, trzymasz go chwilę, a strona sama przechodzi dalej. Dwa takie same dźwięki z rzędu rozdziel krótką przerwą lub przerwij dmuchanie.</p>
 </div>
 </div>
@@ -240,6 +241,7 @@ $('skip').onclick=function(){if(idx<NOTES.length)advance('off');};
 $('learn').onchange=function(){lf=-1;ls=0;lg=0;la=true;af=-1;hold=0;$('hd').style.width='0';$('fb').textContent=$('learn').checked?'Tryb nauki: zagraj dowolny dźwięk, a strona przejdzie dalej':'';};
 $('rst').onclick=function(){goTo(0);};
 $('tol').oninput=zone;
+$('rs').onclick=function(){$('tol').value=45;$('sens').value=5;zone();$('sens').oninput();};
 $('sens').oninput=function(){var v=+$('sens').value;$('sv').textContent=v<4?'niska':(v>6?'wysoka':'średnia');};
 buildSong();zone();render();
 </script>
