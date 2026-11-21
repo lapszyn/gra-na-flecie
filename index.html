@@ -47,6 +47,9 @@ button:disabled{opacity:.5;cursor:default}
 .lg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);justify-content:center;margin-top:10px}
 .lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
 .tg{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px;font-size:14px;cursor:pointer}.tg input{width:20px;height:20px;margin-top:2px;flex:none}
+.stk{position:sticky;top:6px;z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.chip{scroll-margin-top:calc(var(--sh,300px) + 16px);scroll-margin-bottom:12px}
+@media (max-width:520px){.stk{padding:10px}.stk .letter{font-size:46px}.stk .syl{font-size:18px}.stk .now{gap:10px}.stk .st{margin:6px 0 4px}}
 .fin{text-align:center;font-size:22px;color:var(--ok);padding:8px}
 .err{color:var(--bad);font-size:14px;text-align:center;margin-top:6px}
 </style>
@@ -62,7 +65,7 @@ button:disabled{opacity:.5;cursor:default}
 <button id="rst">Od początku</button>
 </div>
 <label class="tg"><input type="checkbox" id="learn"><span><b>Tryb nauki</b>: przechodź dalej po każdym zagranym dźwięku, nawet jeśli nie trafisz. Zielone = dobrze, bursztynowe = prawie, przerywane = inny dźwięk.</span></label>
-<div class="card">
+<div class="card stk" id="stk">
 <div class="now">
 <div id="fl"></div>
 <div class="big"><div class="letter" id="let">–</div><div class="syl" id="syl"></div></div>
@@ -72,6 +75,8 @@ button:disabled{opacity:.5;cursor:default}
 <div class="sub" id="fb" style="text-align:center;margin:0 0 4px;min-height:20px"></div>
 <div class="meter"><div class="zone" id="zone"></div><div class="needle" id="nd"></div></div>
 <div class="hold"><i id="hd"></i></div>
+</div>
+<div class="card">
 <div class="lvl"><i id="lv"></i></div>
 <div class="sub" id="dbg" style="margin:4px 0 0;font-size:12px;text-align:center"></div>
 <div class="lg" id="lg"></div>
@@ -129,14 +134,20 @@ function buildSong(){
 function render(){
   var chips=document.querySelectorAll('.chip');
   for(var i=0;i<chips.length;i++){var k=+chips[i].getAttribute('data-k');chips[i].className='chip'+(k<idx?' d'+(res[k]=='near'?' n':(res[k]=='off'?' o':'')):(k==idx?' c':''));}
+  if(idx>=NOTES.length){$('fl').innerHTML='';$('let').textContent='✓';$('syl').textContent='Brawo! Cała piosenka zagrana';$('nxl').textContent='';$('nxf').innerHTML='';}
+  else{
+    var n=NOTES[idx],c=sc();
+    $('fl').innerHTML=fluteSVG(n.n,c);
+    $('let').textContent=n.n;$('syl').textContent=n.s;
+    if(idx+1<NOTES.length){$('nxl').textContent=NOTES[idx+1].n;$('nxf').innerHTML=fluteSVG(NOTES[idx+1].n,c*0.4);}else{$('nxl').textContent='koniec';$('nxf').innerHTML='';}
+  }
+  setSH();
   var cur=document.querySelector('.chip.c');
   if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest',behavior:'smooth'});
-  if(idx>=NOTES.length){$('fl').innerHTML='';$('let').textContent='✓';$('syl').textContent='Brawo! Cała piosenka zagrana';$('nxl').textContent='';$('nxf').innerHTML='';return;}
-  var n=NOTES[idx];
-  $('fl').innerHTML=fluteSVG(n.n,2);
-  $('let').textContent=n.n;$('syl').textContent=n.s;
-  if(idx+1<NOTES.length){$('nxl').textContent=NOTES[idx+1].n;$('nxf').innerHTML=fluteSVG(NOTES[idx+1].n,0.8);}else{$('nxl').textContent='koniec';$('nxf').innerHTML='';}
 }
+function sc(){return(window.innerWidth<520||window.innerHeight<720)?1.4:2;}
+function setSH(){var e=$('stk');document.documentElement.style.setProperty('--sh',((e&&e.offsetHeight)||300)+'px');}
+window.addEventListener('resize',function(){render();});
 function goTo(k){idx=Math.max(0,Math.min(NOTES.length,k));res.length=Math.min(res.length,idx);prev=null;armed=true;hold=0;miss=0;rel=0;lf=-1;ls=0;lg=0;la=true;af=-1;$('hd').style.width='0';render();}
 function advance(q){res[idx]=q||'ok';prev=NOTES[idx].n;idx++;hold=0;miss=0;rel=0;armed=(idx>=NOTES.length)||NOTES[idx].n!==prev;render();}
 
