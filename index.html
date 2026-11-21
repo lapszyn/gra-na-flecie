@@ -60,6 +60,8 @@ button.p.on{background:transparent;color:var(--berry)}
 .pick{padding:14px 16px}
 .pk{font-weight:600;margin:0 0 10px}
 .pills{display:flex;flex-wrap:wrap;gap:8px}
+.hint{margin:10px 0 0;font-size:13px;opacity:.75}
+.hint:empty{display:none}
 .pill{min-height:44px;padding:0 18px;border-radius:22px;font-size:15px}
 .pill[aria-checked="true"]{background:var(--spruce);border-color:var(--spruce);color:#fff}
 .ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
@@ -121,7 +123,7 @@ details[open] summary::after{content:"–"}
 <button class="p" id="go">Włącz mikrofon</button>
 </header>
 <div class="err" id="er" role="alert"></div>
-<section class="card pick"><p class="pk">Wybierz piosenkę</p><div class="pills" id="songs" role="radiogroup" aria-label="Piosenka"></div></section>
+<section class="card pick"><p class="pk">Wybierz piosenkę</p><div class="pills" id="songs" role="radiogroup" aria-label="Piosenka"></div><p class="hint" id="sh"></p></section>
 <div class="stk" id="stk">
 <div class="stg">
 <div id="fl"></div>
@@ -162,8 +164,8 @@ details[open] summary::after{content:"–"}
 <script>
 var COL=['#888780','#7F77DD','#378ADD','#1D9E75','#639922','#BA7517','#D85A30','#D4537E'];
 var NAM=['kciuk (tył)','lewa wsk.','lewa śr.','lewa serd.','prawa wsk.','prawa śr.','prawa serd.','prawa mały'];
-var FING={C:'11111111',D:'11111110',E:'11111100',F:'11111010',G:'11110000',A:'11100000',B:'11000000',C2:'10100000',D2:'00100000'};
-var FREQ={C:523.25,D:587.33,E:659.26,F:698.46,G:783.99,A:880,B:987.77,C2:1046.5,D2:1174.66};
+var FING={C:'11111111',D:'11111110',E:'11111100',F:'11111011',G:'11110000',A:'11100000',B:'11000000',C2:'10100000',D2:'00100000',E2:'h1111100',F2:'h1111011'};
+var FREQ={C:523.25,D:587.33,E:659.26,F:698.46,G:783.99,A:880,B:987.77,C2:1046.5,D2:1174.66,E2:1318.51,F2:1396.91};
 var Y8=[8,25,38,51,76,89,102,115];
 function dn(n){return n.replace('2',"'");}
 
@@ -175,7 +177,8 @@ function fluteSVG(n,s){
   '<rect x="8" y="1" width="24" height="3" fill="#B88445"/>'+
   '<rect x="6" y="125" width="28" height="8" rx="3" fill="#D3A15F" stroke="#B88445" stroke-width="0.9"/>';
   for(var i=0;i<8;i++){
-    if(f[i]=='1')h+='<circle cx="20" cy="'+Y8[i]+'" r="6.2" fill="'+COL[i]+'" stroke="#fff" stroke-width="1.6"/><circle cx="20" cy="'+Y8[i]+'" r="7.3" fill="none" stroke="#4a2c0e" stroke-width="0.7"/>';
+    if(f[i]=='h')h+='<circle cx="20" cy="'+Y8[i]+'" r="6.2" fill="#1c1008" stroke="#fff" stroke-width="1.6"/><path d="M20 '+(Y8[i]-5.4)+'A5.4 5.4 0 0 0 20 '+(Y8[i]+5.4)+'Z" fill="'+COL[i]+'"/><circle cx="20" cy="'+Y8[i]+'" r="7.3" fill="none" stroke="#4a2c0e" stroke-width="0.7"/>';
+    else if(f[i]=='1')h+='<circle cx="20" cy="'+Y8[i]+'" r="6.2" fill="'+COL[i]+'" stroke="#fff" stroke-width="1.6"/><circle cx="20" cy="'+Y8[i]+'" r="7.3" fill="none" stroke="#4a2c0e" stroke-width="0.7"/>';
     else h+='<circle cx="20" cy="'+Y8[i]+'" r="5" fill="#1c1008" stroke="'+COL[i]+'" stroke-width="1.5"/>';
   }
   return h+'</svg>';
@@ -191,13 +194,35 @@ var SONGS=[
  ['Jingle all the way','E G C D E','Jin gle all the way'],
  ['Oh what fun it is to ride in a','F F F F F E E E E','Oh what fun it is to ride in a'],
  ['One-horse open sleigh (koniec)','G G F D C','one horse o pen sleigh']
+ ]},
+{title:'Cicha noc',hint:'Uwaga: wysokie E\' i F\' w ostatniej frazie wymagają lekko uchylonego kciuka (½). To najtrudniejsze dźwięki w całej kolędzie.',phrases:[
+ ['Cicha noc,','G A G E',''],
+ ['święta noc,','G A G E',''],
+ ['pokój niesie','D2 D2 B',''],
+ ['ludziom wszem,','C2 C2 G',''],
+ ['a u żłóbka','A A C2 B A',''],
+ ['Matka Święta','G A G E',''],
+ ['czuwa sama','A A C2 B A',''],
+ ['uśmiechnięta,','G A G E',''],
+ ['nad dzieciątka snem,','D2 D2 F2 D2 B C2',''],
+ ['nad dzieciątka snem.','E2 C2 G E G F D C','']
+]},
+{title:'Lulajże Jezuniu',phrases:[
+ ['Lulajże Jezuniu,','E E E G F E','Lu la jże Je zu niu'],
+ ['moja perełko,','F D D F A G','mo ja pe reł – ko'],
+ ['Lulaj ulubione','E E E G F E','Lu laj u lu bio ne'],
+ ['me pieścidełko.','F D G F F E','me pie ści deł – ko'],
+ ['Lulajże Jezuniu,','G G C2 B A A','Lu laj że Je zu niu'],
+ ['lulajże, lulaj,','G F F A A G','lu laj że lu – laj'],
+ ['A Ty Go, Matulu,','E E E G F E','a Ty Go Ma tu lu'],
+ ['w płaczu utulaj.','F D G F F E','w\u00a0pła czu u tu – laj']
 ]}
 ];
 var PH=[],NOTES=[],PI=[],curSong=0;
 function setSong(k){
   curSong=k;PH=SONGS[k].phrases;NOTES=[];PI=[];
   PH.forEach(function(p,pi){var a=p[1].split(' '),b=p[2].split(' ');PI.push([]);a.forEach(function(n,i){PI[pi].push(NOTES.length);NOTES.push({n:n,s:b[i]||'',p:pi});});});
-  $('ttl').textContent=SONGS[k].title;document.title=SONGS[k].title+' – nauka na flecie sopranowym';
+  $('ttl').textContent=SONGS[k].title;$('sh').textContent=SONGS[k].hint||'';document.title=SONGS[k].title+' – nauka na flecie sopranowym';
   var pills=document.querySelectorAll('.pill');for(var i=0;i<pills.length;i++)pills[i].setAttribute('aria-checked',i===k?'true':'false');
   try{localStorage.setItem('flet-song',String(k));}catch(e){}
   buildSong();goTo(0);
@@ -211,7 +236,7 @@ function buildPicker(){
 var idx=0,prev=null,armed=true,hold=0,miss=0,rel=0,res=[],lf=-1,ls=0,lg=0,la=true,af=-1;
 var $=function(i){return document.getElementById(i)};
 
-var YP={E:78,F:72,G:66,D:84,C:90,A:60,B:54,C2:48,D2:42};
+var YP={E:78,F:72,G:66,D:84,C:90,A:60,B:54,C2:48,D2:42,E2:36,F2:30};
 function buildSong(){
   var h='';
   PH.forEach(function(p,pi){
@@ -228,6 +253,7 @@ function buildSong(){
   $('song').onclick=function(e){var c=e.target.closest('.chip');if(c){goTo(+c.getAttribute('data-k'));}};
   $('song').onkeydown=function(e){if(e.key==='Enter'||e.key===' '){var c=e.target.closest('.chip');if(c){e.preventDefault();goTo(+c.getAttribute('data-k'));}}};
   var l='';for(var i=0;i<8;i++)l+='<span><i style="background:'+COL[i]+'"></i>'+i+' '+NAM[i]+'</span>';
+  l+='<span><i style="background:linear-gradient(90deg,#888780 50%,#1c1008 50%)"></i>½ kciuk lekko uchylony (wysokie E\' i F\')</span>';
   $('lg').innerHTML=l;
 }
 function render(doScroll){
@@ -252,7 +278,7 @@ function advance(q){res[idx]=q||'ok';prev=NOTES[idx].n;idx++;hold=0;miss=0;rel=0
 
 //YIN-START
 function yin(buf,sr){
-  var W=buf.length>>1,tmin=Math.floor(sr/1250),tmax=Math.min(W-1,Math.floor(sr/380));
+  var W=buf.length>>1,tmin=Math.floor(sr/1500),tmax=Math.min(W-1,Math.floor(sr/380));
   var d=new Float32Array(tmax+1),cm=new Float32Array(tmax+1),t,i,sum=0;
   for(t=1;t<=tmax;t++){var s=0;for(i=0;i<W;i++){var x=buf[i]-buf[i+t];s+=x*x;}d[t]=s;}
   cm[0]=1;
