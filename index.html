@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jingle Bells – nauka na flecie sopranowym</title>
 <style>
-:root{--bg:#fbfaf7;--fg:#1f1f1d;--muted:#6b6a64;--card:#fff;--line:#d9d7cf;--ok:#1D9E75;--okbg:#E1F5EE;--cur:#378ADD;--curbg:#E6F1FB;--bad:#D85A30}
-@media (prefers-color-scheme:dark){:root{--bg:#191917;--fg:#ecebe5;--muted:#a3a198;--card:#232321;--line:#3a3a36;--okbg:#14352b;--curbg:#16314d}}
+:root{--wn:#FAEEDA;--bg:#fbfaf7;--fg:#1f1f1d;--muted:#6b6a64;--card:#fff;--line:#d9d7cf;--ok:#1D9E75;--okbg:#E1F5EE;--cur:#378ADD;--curbg:#E6F1FB;--bad:#D85A30}
+@media (prefers-color-scheme:dark){:root{--wn:#3d2d10;--bg:#191917;--fg:#ecebe5;--muted:#a3a198;--card:#232321;--line:#3a3a36;--okbg:#14352b;--curbg:#16314d}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
 .w{max-width:720px;margin:0 auto;padding:16px}
@@ -39,12 +39,14 @@ button:disabled{opacity:.5;cursor:default}
 .chip b{display:block;font-weight:500;font-size:16px;line-height:1.2}
 .chip span{display:block;font-size:10px;color:var(--muted);line-height:1.1;white-space:nowrap}
 .chip.d{background:var(--okbg);border-color:var(--ok);opacity:.65}
+.chip.n{background:var(--wn);border-color:#BA7517;opacity:.85}.chip.o{background:var(--card);border:1px dashed var(--muted);opacity:.7}
 .chip.c{background:var(--curbg);border-color:var(--cur);box-shadow:0 0 0 2px var(--cur)}
 .set{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;font-size:14px}
 .set label{display:block;color:var(--muted)}
 .set input{width:100%}
 .lg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);justify-content:center;margin-top:10px}
 .lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.tg{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px;font-size:14px;cursor:pointer}.tg input{width:20px;height:20px;margin-top:2px;flex:none}
 .fin{text-align:center;font-size:22px;color:var(--ok);padding:8px}
 .err{color:var(--bad);font-size:14px;text-align:center;margin-top:6px}
 </style>
@@ -59,6 +61,7 @@ button:disabled{opacity:.5;cursor:default}
 <button id="skip">Pomiń ›</button>
 <button id="rst">Od początku</button>
 </div>
+<label class="tg"><input type="checkbox" id="learn"><span><b>Tryb nauki</b>: przechodź dalej po każdym zagranym dźwięku, nawet jeśli nie trafisz. Zielone = dobrze, bursztynowe = prawie, przerywane = inny dźwięk.</span></label>
 <div class="card">
 <div class="now">
 <div id="fl"></div>
@@ -66,6 +69,7 @@ button:disabled{opacity:.5;cursor:default}
 <div class="nx">dalej<div class="l" id="nxl"></div><div id="nxf"></div></div>
 </div>
 <div class="st" id="st">Mikrofon wyłączony</div>
+<div class="sub" id="fb" style="text-align:center;margin:0 0 4px;min-height:20px"></div>
 <div class="meter"><div class="zone" id="zone"></div><div class="needle" id="nd"></div></div>
 <div class="hold"><i id="hd"></i></div>
 <div class="lvl"><i id="lv"></i></div>
@@ -109,7 +113,7 @@ var PH=[
 var NOTES=[],PI=[];
 PH.forEach(function(p,pi){var a=p[1].split(' '),b=p[2].split(' ');PI.push([]);a.forEach(function(n,i){PI[pi].push(NOTES.length);NOTES.push({n:n,s:b[i]||'',p:pi});});});
 
-var idx=0,prev=null,armed=true,hold=0,miss=0,rel=0;
+var idx=0,prev=null,armed=true,hold=0,miss=0,rel=0,res=[],lf=-1,ls=0,lg=0,la=true,af=-1;
 var $=function(i){return document.getElementById(i)};
 
 function buildSong(){
@@ -124,7 +128,7 @@ function buildSong(){
 }
 function render(){
   var chips=document.querySelectorAll('.chip');
-  for(var i=0;i<chips.length;i++){var k=+chips[i].getAttribute('data-k');chips[i].className='chip'+(k<idx?' d':(k==idx?' c':''));}
+  for(var i=0;i<chips.length;i++){var k=+chips[i].getAttribute('data-k');chips[i].className='chip'+(k<idx?' d'+(res[k]=='near'?' n':(res[k]=='off'?' o':'')):(k==idx?' c':''));}
   var cur=document.querySelector('.chip.c');
   if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest',behavior:'smooth'});
   if(idx>=NOTES.length){$('fl').innerHTML='';$('let').textContent='✓';$('syl').textContent='Brawo! Cała piosenka zagrana';$('nxl').textContent='';$('nxf').innerHTML='';return;}
@@ -133,8 +137,8 @@ function render(){
   $('let').textContent=n.n;$('syl').textContent=n.s;
   if(idx+1<NOTES.length){$('nxl').textContent=NOTES[idx+1].n;$('nxf').innerHTML=fluteSVG(NOTES[idx+1].n,0.8);}else{$('nxl').textContent='koniec';$('nxf').innerHTML='';}
 }
-function goTo(k){idx=Math.max(0,Math.min(NOTES.length,k));prev=null;armed=true;hold=0;miss=0;rel=0;$('hd').style.width='0';render();}
-function advance(){prev=NOTES[idx].n;idx++;hold=0;miss=0;rel=0;armed=(idx>=NOTES.length)||NOTES[idx].n!==prev;render();}
+function goTo(k){idx=Math.max(0,Math.min(NOTES.length,k));res.length=Math.min(res.length,idx);prev=null;armed=true;hold=0;miss=0;rel=0;lf=-1;ls=0;lg=0;la=true;af=-1;$('hd').style.width='0';render();}
+function advance(q){res[idx]=q||'ok';prev=NOTES[idx].n;idx++;hold=0;miss=0;rel=0;armed=(idx>=NOTES.length)||NOTES[idx].n!==prev;render();}
 
 //YIN-START
 function yin(buf,sr){
@@ -176,17 +180,32 @@ function loop(t){
   var st=$('st');
   if(f<0){st.innerHTML='Słucham… <b>(cisza)</b>';$('nd').style.left='50%';}
   if(idx>=NOTES.length){return;}
-  var target=FREQ[NOTES[idx].n],cents=null,match=false;
+  var learnOn=$('learn').checked;
+  var target=FREQ[NOTES[idx].n],cents=null,match=false,oc=0;
   if(f>0){cents=1200*Math.log2(f/target);
-    var oc=cents-1200*Math.round(cents/1200);
+    oc=cents-1200*Math.round(cents/1200);
     var near=Math.abs(oc)<=tol;cents=oc;
     st.innerHTML='Słyszę: <b>'+noteName(f)+'</b> ('+Math.round(f)+' Hz) · '+(near?'<b>dobrze</b>':(cents<0?'za nisko':'za wysoko'));
     $('nd').style.left=(50+Math.max(-60,Math.min(60,cents))/120*100)+'%';
     match=near;}
+  if(learnOn){
+    if(f>0){
+      if(lf>0&&Math.abs(1200*Math.log2(f/lf))<70)ls+=dt;else ls=0;
+      lf=f;lg=0;
+      var diff=af>0?Math.abs(1200*Math.log2(f/af)):999;
+      $('hd').style.width=Math.min(100,ls/150*100)+'%';
+      if(ls>=150&&(la||diff>90)){
+        var q=Math.abs(oc)<=tol?'ok':(Math.abs(oc)<=150?'near':'off');
+        $('fb').textContent=NOTES[idx].n+': '+(q=='ok'?'dobrze':(q=='near'?'prawie, blisko':'inny dźwięk niż w melodii'))+' · idę dalej';
+        af=f;la=false;ls=0;advance(q);
+      }
+    }else{lg+=dt;ls=0;lf=-1;$('hd').style.width='0';if(lg>=70){la=true;af=-1;}}
+    return;
+  }
   if(!armed){if(!match){rel+=dt;if(rel>=70){armed=true;rel=0;}}else rel=0;}
   if(armed&&match){hold+=dt;miss=0;}else{miss+=dt;if(miss>60)hold=0;}
   $('hd').style.width=Math.min(100,hold/120*100)+'%';
-  if(armed&&hold>=120)advance();
+  if(armed&&hold>=120)advance('ok');
 }
 function zone(){var tol=+$('tol').value;var w=tol/120*100;$('zone').style.left=(50-w)+'%';$('zone').style.width=(2*w)+'%';$('tv').textContent=tol;}
 
@@ -206,7 +225,8 @@ $('go').onclick=function(){
     $('er').innerHTML=msg+'<br><small>Kod błędu: '+n+' · '+info+'</small>';});
 };
 $('back').onclick=function(){goTo(idx-1);};
-$('skip').onclick=function(){if(idx<NOTES.length)advance();};
+$('skip').onclick=function(){if(idx<NOTES.length)advance('off');};
+$('learn').onchange=function(){lf=-1;ls=0;lg=0;la=true;af=-1;hold=0;$('hd').style.width='0';$('fb').textContent=$('learn').checked?'Tryb nauki: zagraj dowolny dźwięk, a strona przejdzie dalej':'';};
 $('rst').onclick=function(){goTo(0);};
 $('tol').oninput=zone;
 $('sens').oninput=function(){var v=+$('sens').value;$('sv').textContent=v<4?'niska':(v>6?'wysoka':'średnia');};
