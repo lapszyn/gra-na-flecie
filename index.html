@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jingle Bells – nauka na flecie sopranowym</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1f1f1d;--muted:#6b6a64;--card:#fff;--line:#d9d7cf;--ok:#1D9E75;--okbg:#E1F5EE;--cur:#378ADD;--curbg:#E6F1FB;--bad:#D85A30}
+@media (prefers-color-scheme:dark){:root{--bg:#191917;--fg:#ecebe5;--muted:#a3a198;--card:#232321;--line:#3a3a36;--okbg:#14352b;--curbg:#16314d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.w{max-width:720px;margin:0 auto;padding:16px}
+h1{font-size:20px;font-weight:500;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 14px}
+button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:8px 14px;cursor:pointer}
+button.p{background:var(--cur);border-color:var(--cur);color:#fff}
+button:disabled{opacity:.5;cursor:default}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.now{display:flex;gap:16px;align-items:center;justify-content:center}
+.big{text-align:center}
+.letter{font-size:64px;font-weight:500;line-height:1}
+.syl{font-size:22px;color:var(--cur);min-height:30px;margin-top:6px}
+.nx{text-align:center;color:var(--muted);font-size:13px}
+.nx .l{font-size:22px;font-weight:500;color:var(--fg)}
+.st{font-size:14px;color:var(--muted);text-align:center;margin:10px 0 6px;min-height:22px}
+.st b{color:var(--fg);font-weight:500}
+.meter{position:relative;height:14px;border-radius:7px;background:var(--line);margin:6px 0}
+.zone{position:absolute;top:0;bottom:0;background:var(--okbg);border-radius:7px}
+.needle{position:absolute;top:-3px;width:4px;height:20px;border-radius:2px;background:var(--muted);left:50%;transform:translateX(-50%)}
+.hold{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:8px}
+.hold i{display:block;height:100%;width:0;background:var(--ok)}
+.lvl{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:6px}
+.lvl i{display:block;height:100%;width:0;background:var(--muted)}
+.ph{margin-bottom:10px}
+.pl{font-size:12px;color:var(--muted);margin-bottom:4px}
+.ch{display:flex;flex-wrap:wrap;gap:4px}
+.chip{min-width:34px;text-align:center;border:1px solid var(--line);border-radius:6px;padding:2px 4px;cursor:pointer;background:var(--card)}
+.chip b{display:block;font-weight:500;font-size:16px;line-height:1.2}
+.chip span{display:block;font-size:10px;color:var(--muted);line-height:1.1;white-space:nowrap}
+.chip.d{background:var(--okbg);border-color:var(--ok);opacity:.65}
+.chip.c{background:var(--curbg);border-color:var(--cur);box-shadow:0 0 0 2px var(--cur)}
+.set{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;font-size:14px}
+.set label{display:block;color:var(--muted)}
+.set input{width:100%}
+.lg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);justify-content:center;margin-top:10px}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.fin{text-align:center;font-size:22px;color:var(--ok);padding:8px}
+.err{color:var(--bad);font-size:14px;text-align:center;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Jingle Bells – flet sopranowy C</h1>
+<p class="sub">Włącz mikrofon i graj. Strona przejdzie do następnego dźwięku, gdy zagrasz poprawnie obecny.</p>
+<div class="bar">
+<button class="p" id="go">Włącz mikrofon</button>
+<button id="back">‹ Wstecz</button>
+<button id="skip">Pomiń ›</button>
+<button id="rst">Od początku</button>
+</div>
+<div class="card">
+<div class="now">
+<div id="fl"></div>
+<div class="big"><div class="letter" id="let">–</div><div class="syl" id="syl"></div></div>
+<div class="nx">dalej<div class="l" id="nxl"></div><div id="nxf"></div></div>
+</div>
+<div class="st" id="st">Mikrofon wyłączony</div>
+<div class="meter"><div class="zone" id="zone"></div><div class="needle" id="nd"></div></div>
+<div class="hold"><i id="hd"></i></div>
+<div class="lvl"><i id="lv"></i></div>
+<div class="lg" id="lg"></div>
+<div class="err" id="er"></div>
+</div>
+<div class="card" id="song"></div>
+<div class="card">
+<div class="set">
+<div><label>Tolerancja: ±<span id="tv">45</span> centów</label><input type="range" id="tol" min="20" max="80" value="45"></div>
+<div><label>Czułość mikrofonu: <span id="sv">średnia</span></label><input type="range" id="sens" min="1" max="10" value="5"></div>
+</div>
+<p class="sub" style="margin:10px 0 0">Flet sopranowy brzmi o oktawę wyżej niż zapis: C = 523 Hz, D = 587 Hz, E = 659 Hz, F = 698 Hz, G = 784 Hz. Grasz dźwięk, trzymasz go chwilę, a strona sama przechodzi dalej. Dwa takie same dźwięki z rzędu rozdziel krótką przerwą lub przerwij dmuchanie.</p>
+</div>
+</div>
+<script>
+var COL=['#888780','#7F77DD','#378ADD','#1D9E75','#639922','#BA7517','#D85A30','#D4537E'];
+var NAM=['kciuk (tył)','lewa wsk.','lewa śr.','lewa serd.','prawa wsk.','prawa śr.','prawa serd.','prawa mały'];
+var FING={C:'11111111',D:'11111110',E:'11111100',F:'11111010',G:'11110000'};
+var FREQ={C:523.25,D:587.33,E:659.26,F:698.46,G:783.99};
+var Y8=[7,23,35,47,69,81,93,105];
+
+function fluteSVG(n,s){
+  var f=FING[n],h='<svg width="'+36*s+'" height="'+114*s+'" viewBox="0 0 36 114">'+
+  '<rect x="10" y="1" width="16" height="112" rx="8" fill="none" stroke="'+'#9a988f'+'" stroke-width="0.6"/>';
+  for(var i=0;i<8;i++)h+='<circle cx="18" cy="'+Y8[i]+'" r="4" fill="'+(f[i]=='1'?COL[i]:'none')+'" stroke="'+COL[i]+'" stroke-width="1.5"/>';
+  return h+'</svg>';
+}
+
+var PH=[
+ ['Jingle bells, jingle bells','E E E E E E','Jin gle bells jin gle bells'],
+ ['Jingle all the way','E G C D E','Jin gle all the way'],
+ ['Oh what fun it is to ride in a','F F F F F E E E E','Oh what fun it is to ride in a'],
+ ['One-horse open sleigh','D D E D G','one horse o pen sleigh'],
+ ['Jingle bells, jingle bells','E E E E E E','Jin gle bells jin gle bells'],
+ ['Jingle all the way','E G C D E','Jin gle all the way'],
+ ['Oh what fun it is to ride in a','F F F F F E E E E','Oh what fun it is to ride in a'],
+ ['One-horse open sleigh (koniec)','G G F D C','one horse o pen sleigh']
+];
+var NOTES=[],PI=[];
+PH.forEach(function(p,pi){var a=p[1].split(' '),b=p[2].split(' ');PI.push([]);a.forEach(function(n,i){PI[pi].push(NOTES.length);NOTES.push({n:n,s:b[i]||'',p:pi});});});
+
+var idx=0,prev=null,armed=true,hold=0,miss=0,rel=0;
+var $=function(i){return document.getElementById(i)};
+
+function buildSong(){
+  var h='';
+  PH.forEach(function(p,pi){h+='<div class="ph"><div class="pl">'+p[0]+'</div><div class="ch">';
+    PI[pi].forEach(function(k){h+='<div class="chip" data-k="'+k+'"><b>'+NOTES[k].n+'</b><span>'+NOTES[k].s+'</span></div>';});
+    h+='</div></div>';});
+  $('song').innerHTML=h;
+  $('song').onclick=function(e){var c=e.target.closest('.chip');if(c){goTo(+c.getAttribute('data-k'));}};
+  var l='';for(var i=0;i<8;i++)l+='<span><i style="background:'+COL[i]+'"></i>'+i+' '+NAM[i]+'</span>';
+  $('lg').innerHTML=l;
+}
+function render(){
+  var chips=document.querySelectorAll('.chip');
+  for(var i=0;i<chips.length;i++){var k=+chips[i].getAttribute('data-k');chips[i].className='chip'+(k<idx?' d':(k==idx?' c':''));}
+  var cur=document.querySelector('.chip.c');
+  if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest',behavior:'smooth'});
+  if(idx>=NOTES.length){$('fl').innerHTML='';$('let').textContent='✓';$('syl').textContent='Brawo! Cała piosenka zagrana';$('nxl').textContent='';$('nxf').innerHTML='';return;}
+  var n=NOTES[idx];
+  $('fl').innerHTML=fluteSVG(n.n,2);
+  $('let').textContent=n.n;$('syl').textContent=n.s;
+  if(idx+1<NOTES.length){$('nxl').textContent=NOTES[idx+1].n;$('nxf').innerHTML=fluteSVG(NOTES[idx+1].n,0.8);}else{$('nxl').textContent='koniec';$('nxf').innerHTML='';}
+}
+function goTo(k){idx=Math.max(0,Math.min(NOTES.length,k));prev=null;armed=true;hold=0;miss=0;rel=0;$('hd').style.width='0';render();}
+function advance(){prev=NOTES[idx].n;idx++;hold=0;miss=0;rel=0;armed=(idx>=NOTES.length)||NOTES[idx].n!==prev;render();}
+
+//YIN-START
+function yin(buf,sr){
+  var W=buf.length>>1,tmin=Math.floor(sr/1100),tmax=Math.min(W-1,Math.floor(sr/380));
+  var d=new Float32Array(tmax+1),cm=new Float32Array(tmax+1),t,i,sum=0;
+  for(t=1;t<=tmax;t++){var s=0;for(i=0;i<W;i++){var x=buf[i]-buf[i+t];s+=x*x;}d[t]=s;}
+  cm[0]=1;
+  for(t=1;t<=tmax;t++){sum+=d[t];cm[t]=sum>0?d[t]*t/sum:1;}
+  var th=0.15,tau=-1;
+  for(t=tmin;t<=tmax;t++){
+    if(cm[t]<th){while(t+1<=tmax&&cm[t+1]<cm[t])t++;tau=t;break;}
+  }
+  if(tau<0)return -1;
+  var a=tau>1?cm[tau-1]:cm[tau],b=cm[tau],c=tau<tmax?cm[tau+1]:cm[tau];
+  var den=a+c-2*b,sh=den!==0?(a-c)/(2*den):0;
+  return sr/(tau+sh);
+}
+function rmsOf(buf){var s=0;for(var i=0;i<buf.length;i++)s+=buf[i]*buf[i];return Math.sqrt(s/buf.length);}
+//YIN-END
+
+var ctx=null,an=null,buf=null,running=false,lastT=0;
+var NN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+function noteName(f){var m=Math.round(69+12*Math.log2(f/440));return NN[((m%12)+12)%12]+(Math.floor(m/12)-1);}
+function thr(){return 0.03*Math.pow(0.6,(+$('sens').value)-5)*1.0;}
+
+function loop(t){
+  if(!running)return;
+  requestAnimationFrame(loop);
+  var dt=Math.min(100,t-lastT);lastT=t;
+  an.getFloatTimeDomainData(buf);
+  var r=rmsOf(buf);
+  $('lv').style.width=Math.min(100,r*600)+'%';
+  var f=-1;if(r>thr())f=yin(buf,ctx.sampleRate);
+  var tol=+$('tol').value;
+  var st=$('st');
+  if(f<0){st.innerHTML='Słucham… <b>(cisza)</b>';$('nd').style.left='50%';}
+  if(idx>=NOTES.length){return;}
+  var target=FREQ[NOTES[idx].n],cents=null,match=false;
+  if(f>0){cents=1200*Math.log2(f/target);
+    var near=Math.abs(cents)<=tol;
+    st.innerHTML='Słyszę: <b>'+noteName(f)+'</b> ('+Math.round(f)+' Hz) · '+(near?'<b>dobrze</b>':(cents<0?'za nisko':'za wysoko'));
+    $('nd').style.left=(50+Math.max(-60,Math.min(60,cents))/120*100)+'%';
+    match=near;}
+  if(!armed){if(!match){rel+=dt;if(rel>=70){armed=true;rel=0;}}else rel=0;}
+  if(armed&&match){hold+=dt;miss=0;}else{miss+=dt;if(miss>60)hold=0;}
+  $('hd').style.width=Math.min(100,hold/120*100)+'%';
+  if(armed&&hold>=120)advance();
+}
+function zone(){var tol=+$('tol').value;var w=tol/120*100;$('zone').style.left=(50-w)+'%';$('zone').style.width=(2*w)+'%';$('tv').textContent=tol;}
+
+$('go').onclick=function(){
+  if(running){running=false;if(ctx)ctx.close();ctx=null;$('go').textContent='Włącz mikrofon';$('st').textContent='Mikrofon wyłączony';return;}
+  $('er').textContent='';
+  var inFrame=false;try{inFrame=window.self!==window.top;}catch(x){inFrame=true;}
+  var info='Adres: '+location.protocol+'// · bezpieczny kontekst: '+(window.isSecureContext?'tak':'NIE')+' · w ramce: '+(inFrame?'TAK':'nie');
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('er').innerHTML='Przeglądarka nie udostępnia mikrofonu temu plikowi (zwykle dlatego, że strona nie jest otwarta przez https ani jako lokalny plik w Chrome na komputerze). Otwórz plik w Chrome na laptopie albo wrzuć go na hosting https.<br><small>'+info+'</small>';return;}
+  if(inFrame){$('er').innerHTML='Strona jest otwarta w ramce (np. podglądzie w aplikacji), gdzie mikrofon jest zablokowany. Otwórz plik bezpośrednio w przeglądarce.<br><small>'+info+'</small>';}
+  navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}).then(function(s){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    var src=ctx.createMediaStreamSource(s);an=ctx.createAnalyser();an.fftSize=2048;buf=new Float32Array(an.fftSize);src.connect(an);
+    running=true;lastT=performance.now();$('go').textContent='Wyłącz mikrofon';$('st').textContent='Słucham…';requestAnimationFrame(loop);
+  }).catch(function(e){
+    var n=e&&e.name||'błąd',msg={NotAllowedError:'Mikrofon zablokowany. Albo odmówiono zgody, albo przeglądarka/ramka zabrania dostępu bez pytania. Kliknij ikonę kłódki przy adresie i zezwól na mikrofon, albo otwórz plik bezpośrednio w Chrome.',NotFoundError:'Nie znaleziono żadnego mikrofonu.',NotReadableError:'Mikrofon jest zajęty przez inną aplikację.',SecurityError:'Przeglądarka zabrania mikrofonu w tym kontekście (potrzebny https lub Chrome z lokalnego pliku).'}[n]||'Nie udało się włączyć mikrofonu.';
+    $('er').innerHTML=msg+'<br><small>Kod błędu: '+n+' · '+info+'</small>';});
+};
+$('back').onclick=function(){goTo(idx-1);};
+$('skip').onclick=function(){if(idx<NOTES.length)advance();};
+$('rst').onclick=function(){goTo(0);};
+$('tol').oninput=zone;
+$('sens').oninput=function(){var v=+$('sens').value;$('sv').textContent=v<4?'niska':(v>6?'wysoka':'średnia');};
+buildSong();zone();render();
+</script>
+</body>
+</html>
