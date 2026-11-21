@@ -4,93 +4,146 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jingle Bells – nauka na flecie sopranowym</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600&display=swap">
 <style>
-:root{--wn:#FAEEDA;--bg:#fbfaf7;--fg:#1f1f1d;--muted:#6b6a64;--card:#fff;--line:#d9d7cf;--ok:#1D9E75;--okbg:#E1F5EE;--cur:#378ADD;--curbg:#E6F1FB;--bad:#D85A30}
-@media (prefers-color-scheme:dark){:root{--wn:#3d2d10;--bg:#191917;--fg:#ecebe5;--muted:#a3a198;--card:#232321;--line:#3a3a36;--okbg:#14352b;--curbg:#16314d}}
+:root{
+  --paper:#EDF1EF;--card:#FAFCFB;--ink:#10241F;--muted:#58706A;--line:#CBD8D3;--staff:#8FA59E;
+  --spruce:#0F3B34;--spruce2:#16504A;--maple:#E4B97E;--brass:#F2C46D;--berry:#B02A44;--berry-a:rgba(176,42,68,.22);
+  --ok:#1F8A5B;--warn:#E3A93B;
+  --disp:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Figtree","Avenir Next","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#0A1714;--card:#11231F;--ink:#E6EFEC;--muted:#92A8A1;--line:#24403A;--staff:#4F6C65;--berry:#E0566F;--berry-a:rgba(224,86,111,.3)}
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-.w{max-width:720px;margin:0 auto;padding:16px}
-h1{font-size:20px;font-weight:500;margin:0 0 4px}
-.sub{color:var(--muted);font-size:14px;margin:0 0 14px}
-button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:8px 14px;cursor:pointer}
-button.p{background:var(--cur);border-color:var(--cur);color:#fff}
-button:disabled{opacity:.5;cursor:default}
-.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
-.now{display:flex;gap:16px;align-items:center;justify-content:center}
-.big{text-align:center}
-.letter{font-size:64px;font-weight:500;line-height:1}
-.syl{font-size:22px;color:var(--cur);min-height:30px;margin-top:6px}
-.nx{text-align:center;color:var(--muted);font-size:13px}
-.nx .l{font-size:22px;font-weight:500;color:var(--fg)}
-.st{font-size:14px;color:var(--muted);text-align:center;margin:10px 0 6px;min-height:22px}
-.st b{color:var(--fg);font-weight:500}
-.meter{position:relative;height:14px;border-radius:7px;background:var(--line);margin:6px 0}
-.zone{position:absolute;top:0;bottom:0;background:var(--okbg);border-radius:7px}
-.needle{position:absolute;top:-3px;width:4px;height:20px;border-radius:2px;background:var(--muted);left:50%;transform:translateX(-50%)}
-.hold{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:8px}
-.hold i{display:block;height:100%;width:0;background:var(--ok)}
-.lvl{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:6px}
-.lvl i{display:block;height:100%;width:0;background:var(--muted)}
-.ph{margin-bottom:10px}
-.pl{font-size:12px;color:var(--muted);margin-bottom:4px}
-.ch{display:flex;flex-wrap:wrap;gap:4px}
-.chip{min-width:34px;text-align:center;border:1px solid var(--line);border-radius:6px;padding:2px 4px;cursor:pointer;background:var(--card)}
-.chip b{display:block;font-weight:500;font-size:16px;line-height:1.2}
-.chip span{display:block;font-size:10px;color:var(--muted);line-height:1.1;white-space:nowrap}
-.chip.d{background:var(--okbg);border-color:var(--ok);opacity:.65}
-.chip.n{background:var(--wn);border-color:#BA7517;opacity:.85}.chip.o{background:var(--card);border:1px dashed var(--muted);opacity:.7}
-.chip.c{background:var(--curbg);border-color:var(--cur);box-shadow:0 0 0 2px var(--cur)}
-.set{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;font-size:14px}
-.set label{display:block;color:var(--muted)}
-.set input{width:100%}
-.lg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);justify-content:center;margin-top:10px}
-.lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
-.tg{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px;font-size:14px;cursor:pointer}.tg input{width:20px;height:20px;margin-top:2px;flex:none}
-.stk{position:sticky;top:6px;z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 var(--body)}
+.w{max-width:680px;margin:0 auto;padding:18px 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}
+h1{font:800 clamp(28px,8vw,40px)/1 var(--disp);letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);font-size:14px;margin:4px 0 0}
+button{font:600 15px/1 var(--body);min-height:44px;padding:0 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--muted)}
+button.p{background:var(--berry);border-color:var(--berry);color:#fff;white-space:nowrap}
+button.p.on{background:transparent;color:var(--berry)}
+:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
+.err{color:#B3261E;font-size:14px;margin:0 0 12px}
+.err:empty{display:none}
+@media (prefers-color-scheme:dark){.err{color:#FF8A80}}
+
+.stk{position:sticky;top:8px;z-index:5;margin-bottom:14px;background:var(--spruce);color:#E8F1EE;border-radius:22px;padding:18px 18px 16px;box-shadow:0 8px 24px rgba(8,30,26,.35)}
+.now{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center}
+.big{text-align:center;min-width:0}
+.letter{font:800 clamp(64px,22vw,104px)/.9 var(--disp);color:#fff;letter-spacing:-.03em}
+.syl{font:600 clamp(18px,5vw,24px)/1.2 var(--disp);color:var(--brass);min-height:1.2em;margin-top:6px}
+.nx{text-align:center;color:#9DB8B1;font-size:13px;min-width:44px}
+.nx .l{font:700 22px/1.2 var(--disp);color:#E8F1EE}
+.st{font-size:14px;color:#B7CEC8;text-align:center;margin:12px 0 2px;min-height:21px}
+.st b{color:#fff;font-weight:600}
+.fb{font-size:13px;color:var(--brass);text-align:center;min-height:19px;margin-bottom:6px}
+.meter{position:relative;height:12px;border-radius:6px;background:rgba(255,255,255,.13);margin:4px 0 0}
+.meter::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:rgba(255,255,255,.35)}
+.zone{position:absolute;top:0;bottom:0;background:rgba(80,200,140,.42);border-radius:6px}
+.needle{position:absolute;top:-4px;width:4px;height:20px;border-radius:2px;background:#fff;left:50%;transform:translateX(-50%);z-index:1}
+.hold{height:4px;border-radius:2px;background:rgba(255,255,255,.13);overflow:hidden;margin-top:12px}
+.hold i{display:block;height:100%;width:0;background:var(--brass)}
+.lvl{height:3px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:6px}
+.lvl i{display:block;height:100%;width:0;background:#7FD1B0}
+
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
+.ctl button{min-height:40px;font-size:14px}
+.tg{display:flex;gap:12px;align-items:center;margin:0 0 14px;padding:12px 14px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;cursor:pointer;position:relative}
+.tg input{position:absolute;opacity:0;width:1px;height:1px}
+.tg .sw{flex:none;width:46px;height:28px;border-radius:14px;background:var(--line);position:relative;transition:background .15s}
+.tg .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s}
+.tg input:checked+.sw{background:var(--ok)}
+.tg input:checked+.sw::after{transform:translateX(18px)}
+.tg input:focus-visible+.sw{outline:3px solid var(--berry);outline-offset:2px}
+.tg b{display:block;font-weight:600}
+.tg span.t{font-size:13px;color:var(--muted);line-height:1.35;display:block}
+
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:16px;margin:0 0 14px}
+.lg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.lg span{display:inline-flex;align-items:center;gap:6px}
+.lg i{width:11px;height:11px;border-radius:50%;display:inline-block}
+.song{padding:14px 12px 6px}
+.ph{margin:0 0 10px}
+.pl{font:600 14px/1.3 var(--disp);color:var(--ink);margin:0 4px 2px}
+.stf{position:relative;height:128px;margin:0 10px}
+.stf::before{content:"";position:absolute;left:-6px;right:-6px;top:30px;height:49px;background:repeating-linear-gradient(to bottom,var(--staff) 0 1px,transparent 1px 12px)}
+.ledger{position:absolute;top:90px;width:40px;height:1px;background:var(--staff);transform:translateX(-50%)}
+.chip{position:absolute;z-index:1;width:28px;height:28px;margin-left:-14px;border-radius:50%;background:var(--card);border:1.5px solid var(--ink);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s,background .15s}
+.chip b{font:700 13px/1 var(--disp)}
+.chip .sy{position:absolute;left:50%;transform:translateX(-50%);font-size:11px;line-height:1;color:var(--muted);white-space:nowrap;pointer-events:none}
+.chip.d{background:var(--ok);border-color:var(--ok);color:#fff}
+.chip.d.n{background:var(--warn);border-color:var(--warn);color:#2b1c00}
+.chip.d.o{background:var(--card);border:1.5px dashed var(--muted);color:var(--muted)}
+.chip.c{border-color:var(--berry);background:var(--berry);color:#fff;box-shadow:0 0 0 4px var(--berry-a);transform:scale(1.15)}
+.chip.c .sy{color:var(--ink);font-weight:600;transform:translateX(-50%) scale(.87)}
+
+details.card{padding:0}
+summary{cursor:pointer;padding:14px 16px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:20px;color:var(--muted)}
+details[open] summary::after{content:"–"}
+.in{padding:0 16px 16px}
+.set{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;font-size:14px}
+.set label{display:block;color:var(--muted);margin-bottom:4px}
+.set input{width:100%;accent-color:var(--berry)}
+.in button{margin-top:14px;min-height:40px;font-size:14px}
+.dbg{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;color:var(--muted);margin:12px 0 0}
+.in .sub{margin-top:12px;line-height:1.5}
+@media (max-width:520px){
+  .stk{padding:14px 14px 12px;border-radius:18px}
+  .now{gap:10px}
+  .set{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 .chip{scroll-margin-top:calc(var(--sh,300px) + 16px);scroll-margin-bottom:12px}
-@media (max-width:520px){.stk{padding:10px}.stk .letter{font-size:46px}.stk .syl{font-size:18px}.stk .now{gap:10px}.stk .st{margin:6px 0 4px}}
-.fin{text-align:center;font-size:22px;color:var(--ok);padding:8px}
-.err{color:var(--bad);font-size:14px;text-align:center;margin-top:6px}
 </style>
 </head>
 <body>
 <div class="w">
-<h1>Jingle Bells – flet sopranowy C</h1>
-<p class="sub">Włącz mikrofon i graj. Strona przejdzie do następnego dźwięku, gdy zagrasz poprawnie obecny.</p>
-<div class="bar">
+<header>
+<div><h1>Jingle Bells</h1><p class="sub">Flet sopranowy C: zagraj dźwięk, a melodia pójdzie dalej</p></div>
 <button class="p" id="go">Włącz mikrofon</button>
-<button id="back">‹ Wstecz</button>
-<button id="skip">Pomiń ›</button>
-<button id="rst">Od początku</button>
-</div>
-<label class="tg"><input type="checkbox" id="learn"><span><b>Tryb nauki</b>: przechodź dalej po każdym zagranym dźwięku, nawet jeśli nie trafisz. Zielone = dobrze, bursztynowe = prawie, przerywane = inny dźwięk.</span></label>
-<div class="card stk" id="stk">
+</header>
+<div class="err" id="er" role="alert"></div>
+<div class="stk" id="stk">
 <div class="now">
 <div id="fl"></div>
 <div class="big"><div class="letter" id="let">–</div><div class="syl" id="syl"></div></div>
 <div class="nx">dalej<div class="l" id="nxl"></div><div id="nxf"></div></div>
 </div>
-<div class="st" id="st">Mikrofon wyłączony</div>
-<div class="sub" id="fb" style="text-align:center;margin:0 0 4px;min-height:20px"></div>
+<div class="st" id="st" aria-live="polite">Mikrofon wyłączony</div>
+<div class="fb" id="fb" aria-live="polite"></div>
 <div class="meter"><div class="zone" id="zone"></div><div class="needle" id="nd"></div></div>
 <div class="hold"><i id="hd"></i></div>
-</div>
-<div class="card">
 <div class="lvl"><i id="lv"></i></div>
-<div class="sub" id="dbg" style="margin:4px 0 0;font-size:12px;text-align:center"></div>
-<div class="lg" id="lg"></div>
-<div class="err" id="er"></div>
 </div>
-<div class="card" id="song"></div>
-<div class="card">
+<div class="ctl">
+<button id="back" type="button">‹ Wstecz</button>
+<button id="skip" type="button">Pomiń ›</button>
+<button id="rst" type="button">Od początku</button>
+</div>
+<label class="tg"><input type="checkbox" id="learn"><span class="sw"></span><span><b>Tryb nauki</b><span class="t">Idę dalej po każdym zagranym dźwięku, nawet gdy nie trafisz. Zielone: dobrze, żółte: prawie, przerywane: inny dźwięk.</span></span></label>
+<section class="card"><div class="lg" id="lg"></div></section>
+<section class="card song" id="song"></section>
+<details class="card">
+<summary>Ustawienia i diagnostyka</summary>
+<div class="in">
 <div class="set">
-<div><label>Tolerancja: ±<span id="tv">45</span> centów</label><input type="range" id="tol" min="20" max="80" value="45"></div>
-<div><label>Czułość mikrofonu: <span id="sv">średnia</span></label><input type="range" id="sens" min="1" max="10" value="5"></div>
+<div><label for="tol">Tolerancja: ±<span id="tv">45</span> centów</label><input type="range" id="tol" min="20" max="80" value="45"></div>
+<div><label for="sens">Czułość mikrofonu: <span id="sv">średnia</span></label><input type="range" id="sens" min="1" max="10" value="5"></div>
 </div>
-<button id="rs" type="button" style="margin-top:12px">Przywróć domyślne ustawienia</button>
-<p class="sub" style="margin:10px 0 0">Flet sopranowy brzmi o oktawę wyżej niż zapis: C = 523 Hz, D = 587 Hz, E = 659 Hz, F = 698 Hz, G = 784 Hz. Grasz dźwięk, trzymasz go chwilę, a strona sama przechodzi dalej. Dwa takie same dźwięki z rzędu rozdziel krótką przerwą lub przerwij dmuchanie.</p>
+<button id="rs" type="button">Przywróć domyślne ustawienia</button>
+<div class="dbg" id="dbg"></div>
+<p class="sub">Flet sopranowy brzmi o oktawę wyżej niż zapis: C = 523 Hz, D = 587 Hz, E = 659 Hz, F = 698 Hz, G = 784 Hz. Dwa takie same dźwięki z rzędu rozdziel krótką przerwą w dmuchaniu.</p>
 </div>
+</details>
 </div>
 <script>
 var COL=['#888780','#7F77DD','#378ADD','#1D9E75','#639922','#BA7517','#D85A30','#D4537E'];
@@ -100,9 +153,16 @@ var FREQ={C:523.25,D:587.33,E:659.26,F:698.46,G:783.99};
 var Y8=[7,23,35,47,69,81,93,105];
 
 function fluteSVG(n,s){
-  var f=FING[n],h='<svg width="'+36*s+'" height="'+114*s+'" viewBox="0 0 36 114">'+
-  '<rect x="10" y="1" width="16" height="112" rx="8" fill="none" stroke="'+'#9a988f'+'" stroke-width="0.6"/>';
-  for(var i=0;i<8;i++)h+='<circle cx="18" cy="'+Y8[i]+'" r="4" fill="'+(f[i]=='1'?COL[i]:'none')+'" stroke="'+COL[i]+'" stroke-width="1.5"/>';
+  var f=FING[n];
+  var h='<svg width="'+36*s+'" height="'+131*s+'" viewBox="0 -9 36 131" aria-hidden="true">'+
+  '<path d="M13.5 -8h9l1.5 9h-12z" fill="#8C5A2B"/>'+
+  '<rect x="10" y="1" width="16" height="112" rx="3" fill="#E4B97E" stroke="#B88445" stroke-width="0.8"/>'+
+  '<rect x="10" y="1" width="16" height="3" fill="#B88445"/>'+
+  '<rect x="8" y="112" width="20" height="8" rx="3" fill="#D3A15F" stroke="#B88445" stroke-width="0.8"/>';
+  for(var i=0;i<8;i++){
+    if(f[i]=='1')h+='<circle cx="18" cy="'+Y8[i]+'" r="4.4" fill="'+COL[i]+'" stroke="#4a2c0e" stroke-width="0.8"/>';
+    else h+='<circle cx="18" cy="'+Y8[i]+'" r="4" fill="#2a170a" stroke="'+COL[i]+'" stroke-width="1.6"/>';
+  }
   return h+'</svg>';
 }
 
@@ -122,13 +182,22 @@ PH.forEach(function(p,pi){var a=p[1].split(' '),b=p[2].split(' ');PI.push([]);a.
 var idx=0,prev=null,armed=true,hold=0,miss=0,rel=0,res=[],lf=-1,ls=0,lg=0,la=true,af=-1;
 var $=function(i){return document.getElementById(i)};
 
+var YP={E:78,F:72,G:66,D:84,C:90};
 function buildSong(){
   var h='';
-  PH.forEach(function(p,pi){h+='<div class="ph"><div class="pl">'+p[0]+'</div><div class="ch">';
-    PI[pi].forEach(function(k){h+='<div class="chip" data-k="'+k+'"><b>'+NOTES[k].n+'</b><span>'+NOTES[k].s+'</span></div>';});
-    h+='</div></div>';});
+  PH.forEach(function(p,pi){
+    var ids=PI[pi],cnt=ids.length;
+    h+='<div class="ph"><div class="pl">'+p[0]+'</div><div class="stf">';
+    ids.forEach(function(k,i){
+      var n=NOTES[k].n,L=((i+0.5)*100/cnt).toFixed(2),y=YP[n],top=y-14;
+      if(n=='C')h+='<i class="ledger" style="left:'+L+'%"></i>';
+      h+='<div class="chip" data-k="'+k+'" data-n="'+n+'" role="button" tabindex="0" aria-label="'+n+', '+NOTES[k].s+'" style="left:'+L+'%;top:'+top+'px"><b>'+n+'</b><span class="sy" style="top:'+(112-top)+'px">'+NOTES[k].s+'</span></div>';
+    });
+    h+='</div></div>';
+  });
   $('song').innerHTML=h;
   $('song').onclick=function(e){var c=e.target.closest('.chip');if(c){goTo(+c.getAttribute('data-k'));}};
+  $('song').onkeydown=function(e){if(e.key==='Enter'||e.key===' '){var c=e.target.closest('.chip');if(c){e.preventDefault();goTo(+c.getAttribute('data-k'));}}};
   var l='';for(var i=0;i<8;i++)l+='<span><i style="background:'+COL[i]+'"></i>'+i+' '+NAM[i]+'</span>';
   $('lg').innerHTML=l;
 }
@@ -146,7 +215,7 @@ function render(){
   var cur=document.querySelector('.chip.c');
   if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
-function sc(){return(window.innerWidth<520||window.innerHeight<720)?1.4:2;}
+function sc(){return(window.innerWidth<520||window.innerHeight<720)?1.25:1.75;}
 function setSH(){var e=$('stk');document.documentElement.style.setProperty('--sh',((e&&e.offsetHeight)||300)+'px');}
 window.addEventListener('resize',function(){render();});
 function goTo(k){idx=Math.max(0,Math.min(NOTES.length,k));res.length=Math.min(res.length,idx);prev=null;armed=true;hold=0;miss=0;rel=0;lf=-1;ls=0;lg=0;la=true;af=-1;$('hd').style.width='0';render();}
@@ -187,7 +256,7 @@ function loop(t){
   if(calMs<800){calMs+=dt;calSum+=r;calN++;noise=Math.min(0.02,calSum/calN);$('st').textContent='Kalibracja szumu… bądź cicho';return;}
   var f=-1,T=thr();
   if(r>T){var mx=0,i;for(i=0;i<buf.length;i++){var a=Math.abs(buf[i]);if(a>mx)mx=a;}var g=mx>0?Math.min(100,0.5/mx):1;for(i=0;i<buf.length;i++)nb[i]=buf[i]*g;f=yin(nb,ctx.sampleRate);}
-  $('dbg').textContent='poziom '+r.toFixed(4)+' · próg '+T.toFixed(4)+' · '+(f>0?Math.round(f)+' Hz':'brak tonu');
+  $('dbg').textContent='poziom '+r.toFixed(4)+' / próg '+T.toFixed(4)+' / '+(f>0?Math.round(f)+' Hz':'brak tonu');
   var tol=+$('tol').value;
   var st=$('st');
   if(f<0){st.innerHTML='Słucham… <b>(cisza)</b>';$('nd').style.left='50%';}
@@ -222,7 +291,7 @@ function loop(t){
 function zone(){var tol=+$('tol').value;var w=tol/120*100;$('zone').style.left=(50-w)+'%';$('zone').style.width=(2*w)+'%';$('tv').textContent=tol;}
 
 $('go').onclick=function(){
-  if(running){running=false;if(ctx)ctx.close();ctx=null;$('go').textContent='Włącz mikrofon';$('st').textContent='Mikrofon wyłączony';return;}
+  if(running){running=false;if(ctx)ctx.close();ctx=null;$('go').textContent='Włącz mikrofon';$('go').classList.remove('on');$('st').textContent='Mikrofon wyłączony';return;}
   $('er').textContent='';
   var inFrame=false;try{inFrame=window.self!==window.top;}catch(x){inFrame=true;}
   var info='Adres: '+location.protocol+'// · bezpieczny kontekst: '+(window.isSecureContext?'tak':'NIE')+' · w ramce: '+(inFrame?'TAK':'nie');
@@ -231,7 +300,7 @@ $('go').onclick=function(){
   navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}).then(function(s){
     ctx=new (window.AudioContext||window.webkitAudioContext)();
     var src=ctx.createMediaStreamSource(s);an=ctx.createAnalyser();an.fftSize=2048;buf=new Float32Array(an.fftSize);nb=new Float32Array(an.fftSize);calMs=0;calSum=0;calN=0;src.connect(an);
-    running=true;lastT=performance.now();$('go').textContent='Wyłącz mikrofon';$('st').textContent='Słucham…';requestAnimationFrame(loop);
+    running=true;lastT=performance.now();$('go').textContent='Wyłącz mikrofon';$('go').classList.add('on');$('st').textContent='Słucham…';requestAnimationFrame(loop);
   }).catch(function(e){
     var n=e&&e.name||'błąd',msg={NotAllowedError:'Mikrofon zablokowany. Albo odmówiono zgody, albo przeglądarka/ramka zabrania dostępu bez pytania. Kliknij ikonę kłódki przy adresie i zezwól na mikrofon, albo otwórz plik bezpośrednio w Chrome.',NotFoundError:'Nie znaleziono żadnego mikrofonu.',NotReadableError:'Mikrofon jest zajęty przez inną aplikację.',SecurityError:'Przeglądarka zabrania mikrofonu w tym kontekście (potrzebny https lub Chrome z lokalnego pliku).'}[n]||'Nie udało się włączyć mikrofonu.';
     $('er').innerHTML=msg+'<br><small>Kod błędu: '+n+' · '+info+'</small>';});
