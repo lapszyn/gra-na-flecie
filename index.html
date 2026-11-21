@@ -37,11 +37,11 @@ button.p.on{background:transparent;color:var(--berry)}
 .stk{position:sticky;top:8px;z-index:5;margin-bottom:14px;background:var(--spruce);color:#E8F1EE;border-radius:22px;padding:18px 18px 16px;box-shadow:0 8px 24px rgba(8,30,26,.35)}
 .now{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center}
 .big{text-align:center;min-width:0}
-.letter{font:800 clamp(64px,22vw,104px)/.9 var(--disp);color:#fff;letter-spacing:-.03em}
+.letter{font:800 clamp(56px,18vw,92px)/.9 var(--disp);color:#fff;letter-spacing:-.03em}
 .syl{font:600 clamp(18px,5vw,24px)/1.2 var(--disp);color:var(--brass);min-height:1.2em;margin-top:6px}
 .nx{text-align:center;color:#9DB8B1;font-size:13px;min-width:44px}
 .nx .l{font:700 22px/1.2 var(--disp);color:#E8F1EE}
-.st{font-size:14px;color:#B7CEC8;text-align:center;margin:12px 0 2px;min-height:21px}
+.st{font-size:14px;color:#B7CEC8;text-align:center;margin:10px 0 2px;min-height:21px}
 .st b{color:#fff;font-weight:600}
 .fb{font-size:13px;color:var(--brass);text-align:center;min-height:19px;margin-bottom:6px}
 .meter{position:relative;height:12px;border-radius:6px;background:rgba(255,255,255,.13);margin:4px 0 0}
@@ -53,6 +53,15 @@ button.p.on{background:transparent;color:var(--berry)}
 .lvl{height:3px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:6px}
 .lvl i{display:block;height:100%;width:0;background:#7FD1B0}
 
+.stg{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+.rt{min-width:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top .big{flex:1}
+.pick{padding:14px 16px}
+.pk{font-weight:600;margin:0 0 10px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{min-height:44px;padding:0 18px;border-radius:22px;font-size:15px}
+.pill[aria-checked="true"]{background:var(--spruce);border-color:var(--spruce);color:#fff}
 .ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
 .ctl button{min-height:40px;font-size:14px}
 .tg{display:flex;gap:12px;align-items:center;margin:0 0 14px;padding:12px 14px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;cursor:pointer;position:relative}
@@ -108,13 +117,16 @@ details[open] summary::after{content:"–"}
 <body>
 <div class="w">
 <header>
-<div><h1>Jingle Bells</h1><p class="sub">Flet sopranowy C: zagraj dźwięk, a melodia pójdzie dalej</p></div>
+<div><h1 id="ttl">Jingle Bells</h1><p class="sub">Flet sopranowy C: zagraj dźwięk, a melodia pójdzie dalej</p></div>
 <button class="p" id="go">Włącz mikrofon</button>
 </header>
 <div class="err" id="er" role="alert"></div>
+<section class="card pick"><p class="pk">Wybierz piosenkę</p><div class="pills" id="songs" role="radiogroup" aria-label="Piosenka"></div></section>
 <div class="stk" id="stk">
-<div class="now">
+<div class="stg">
 <div id="fl"></div>
+<div class="rt">
+<div class="top">
 <div class="big"><div class="letter" id="let">–</div><div class="syl" id="syl"></div></div>
 <div class="nx">dalej<div class="l" id="nxl"></div><div id="nxf"></div></div>
 </div>
@@ -123,6 +135,8 @@ details[open] summary::after{content:"–"}
 <div class="meter"><div class="zone" id="zone"></div><div class="needle" id="nd"></div></div>
 <div class="hold"><i id="hd"></i></div>
 <div class="lvl"><i id="lv"></i></div>
+</div>
+</div>
 </div>
 <div class="ctl">
 <button id="back" type="button">‹ Wstecz</button>
@@ -148,25 +162,27 @@ details[open] summary::after{content:"–"}
 <script>
 var COL=['#888780','#7F77DD','#378ADD','#1D9E75','#639922','#BA7517','#D85A30','#D4537E'];
 var NAM=['kciuk (tył)','lewa wsk.','lewa śr.','lewa serd.','prawa wsk.','prawa śr.','prawa serd.','prawa mały'];
-var FING={C:'11111111',D:'11111110',E:'11111100',F:'11111010',G:'11110000'};
-var FREQ={C:523.25,D:587.33,E:659.26,F:698.46,G:783.99};
-var Y8=[7,23,35,47,69,81,93,105];
+var FING={C:'11111111',D:'11111110',E:'11111100',F:'11111010',G:'11110000',A:'11100000',B:'11000000',C2:'10100000',D2:'00100000'};
+var FREQ={C:523.25,D:587.33,E:659.26,F:698.46,G:783.99,A:880,B:987.77,C2:1046.5,D2:1174.66};
+var Y8=[8,25,38,51,76,89,102,115];
+function dn(n){return n.replace('2',"'");}
 
 function fluteSVG(n,s){
   var f=FING[n];
-  var h='<svg width="'+36*s+'" height="'+131*s+'" viewBox="0 -9 36 131" aria-hidden="true">'+
-  '<path d="M13.5 -8h9l1.5 9h-12z" fill="#8C5A2B"/>'+
-  '<rect x="10" y="1" width="16" height="112" rx="3" fill="#E4B97E" stroke="#B88445" stroke-width="0.8"/>'+
-  '<rect x="10" y="1" width="16" height="3" fill="#B88445"/>'+
-  '<rect x="8" y="112" width="20" height="8" rx="3" fill="#D3A15F" stroke="#B88445" stroke-width="0.8"/>';
+  var h='<svg width="'+40*s+'" height="'+143*s+'" viewBox="0 -9 40 143" aria-hidden="true">'+
+  '<path d="M15 -8h10l2 9H13z" fill="#8C5A2B"/>'+
+  '<rect x="8" y="1" width="24" height="125" rx="3" fill="#E4B97E" stroke="#B88445" stroke-width="0.9"/>'+
+  '<rect x="8" y="1" width="24" height="3" fill="#B88445"/>'+
+  '<rect x="6" y="125" width="28" height="8" rx="3" fill="#D3A15F" stroke="#B88445" stroke-width="0.9"/>';
   for(var i=0;i<8;i++){
-    if(f[i]=='1')h+='<circle cx="18" cy="'+Y8[i]+'" r="4.4" fill="'+COL[i]+'" stroke="#4a2c0e" stroke-width="0.8"/>';
-    else h+='<circle cx="18" cy="'+Y8[i]+'" r="4" fill="#2a170a" stroke="'+COL[i]+'" stroke-width="1.6"/>';
+    if(f[i]=='1')h+='<circle cx="20" cy="'+Y8[i]+'" r="6.2" fill="'+COL[i]+'" stroke="#fff" stroke-width="1.6"/><circle cx="20" cy="'+Y8[i]+'" r="7.3" fill="none" stroke="#4a2c0e" stroke-width="0.7"/>';
+    else h+='<circle cx="20" cy="'+Y8[i]+'" r="5" fill="#1c1008" stroke="'+COL[i]+'" stroke-width="1.5"/>';
   }
   return h+'</svg>';
 }
 
-var PH=[
+var SONGS=[
+{title:'Jingle Bells',phrases:[
  ['Jingle bells, jingle bells','E E E E E E','Jin gle bells jin gle bells'],
  ['Jingle all the way','E G C D E','Jin gle all the way'],
  ['Oh what fun it is to ride in a','F F F F F E E E E','Oh what fun it is to ride in a'],
@@ -175,14 +191,27 @@ var PH=[
  ['Jingle all the way','E G C D E','Jin gle all the way'],
  ['Oh what fun it is to ride in a','F F F F F E E E E','Oh what fun it is to ride in a'],
  ['One-horse open sleigh (koniec)','G G F D C','one horse o pen sleigh']
+]}
 ];
-var NOTES=[],PI=[];
-PH.forEach(function(p,pi){var a=p[1].split(' '),b=p[2].split(' ');PI.push([]);a.forEach(function(n,i){PI[pi].push(NOTES.length);NOTES.push({n:n,s:b[i]||'',p:pi});});});
+var PH=[],NOTES=[],PI=[],curSong=0;
+function setSong(k){
+  curSong=k;PH=SONGS[k].phrases;NOTES=[];PI=[];
+  PH.forEach(function(p,pi){var a=p[1].split(' '),b=p[2].split(' ');PI.push([]);a.forEach(function(n,i){PI[pi].push(NOTES.length);NOTES.push({n:n,s:b[i]||'',p:pi});});});
+  $('ttl').textContent=SONGS[k].title;document.title=SONGS[k].title+' – nauka na flecie sopranowym';
+  var pills=document.querySelectorAll('.pill');for(var i=0;i<pills.length;i++)pills[i].setAttribute('aria-checked',i===k?'true':'false');
+  try{localStorage.setItem('flet-song',String(k));}catch(e){}
+  buildSong();goTo(0);
+}
+function buildPicker(){
+  var h='';SONGS.forEach(function(sg,i){h+='<button type="button" class="pill" role="radio" aria-checked="false" data-s="'+i+'">'+sg.title+'</button>';});
+  $('songs').innerHTML=h;
+  $('songs').onclick=function(e){var b=e.target.closest('.pill');if(b)setSong(+b.getAttribute('data-s'));};
+}
 
 var idx=0,prev=null,armed=true,hold=0,miss=0,rel=0,res=[],lf=-1,ls=0,lg=0,la=true,af=-1;
 var $=function(i){return document.getElementById(i)};
 
-var YP={E:78,F:72,G:66,D:84,C:90};
+var YP={E:78,F:72,G:66,D:84,C:90,A:60,B:54,C2:48,D2:42};
 function buildSong(){
   var h='';
   PH.forEach(function(p,pi){
@@ -191,7 +220,7 @@ function buildSong(){
     ids.forEach(function(k,i){
       var n=NOTES[k].n,L=((i+0.5)*100/cnt).toFixed(2),y=YP[n],top=y-14;
       if(n=='C')h+='<i class="ledger" style="left:'+L+'%"></i>';
-      h+='<div class="chip" data-k="'+k+'" data-n="'+n+'" role="button" tabindex="0" aria-label="'+n+', '+NOTES[k].s+'" style="left:'+L+'%;top:'+top+'px"><b>'+n+'</b><span class="sy" style="top:'+(112-top)+'px">'+NOTES[k].s+'</span></div>';
+      h+='<div class="chip" data-k="'+k+'" data-n="'+n+'" role="button" tabindex="0" aria-label="'+dn(n)+', '+NOTES[k].s+'" style="left:'+L+'%;top:'+top+'px"><b>'+dn(n)+'</b><span class="sy" style="top:'+(112-top)+'px">'+NOTES[k].s+'</span></div>';
     });
     h+='</div></div>';
   });
@@ -201,29 +230,29 @@ function buildSong(){
   var l='';for(var i=0;i<8;i++)l+='<span><i style="background:'+COL[i]+'"></i>'+i+' '+NAM[i]+'</span>';
   $('lg').innerHTML=l;
 }
-function render(){
+function render(doScroll){
   var chips=document.querySelectorAll('.chip');
   for(var i=0;i<chips.length;i++){var k=+chips[i].getAttribute('data-k');chips[i].className='chip'+(k<idx?' d'+(res[k]=='near'?' n':(res[k]=='off'?' o':'')):(k==idx?' c':''));}
   if(idx>=NOTES.length){$('fl').innerHTML='';$('let').textContent='✓';$('syl').textContent='Brawo! Cała piosenka zagrana';$('nxl').textContent='';$('nxf').innerHTML='';}
   else{
     var n=NOTES[idx],c=sc();
     $('fl').innerHTML=fluteSVG(n.n,c);
-    $('let').textContent=n.n;$('syl').textContent=n.s;
-    if(idx+1<NOTES.length){$('nxl').textContent=NOTES[idx+1].n;$('nxf').innerHTML=fluteSVG(NOTES[idx+1].n,c*0.4);}else{$('nxl').textContent='koniec';$('nxf').innerHTML='';}
+    $('let').textContent=dn(n.n);$('syl').textContent=n.s;
+    if(idx+1<NOTES.length){$('nxl').textContent=dn(NOTES[idx+1].n);$('nxf').innerHTML=fluteSVG(NOTES[idx+1].n,c*0.4);}else{$('nxl').textContent='koniec';$('nxf').innerHTML='';}
   }
   setSH();
   var cur=document.querySelector('.chip.c');
-  if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest',behavior:'smooth'});
+  if(doScroll===true&&cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
-function sc(){return(window.innerWidth<520||window.innerHeight<720)?1.25:1.75;}
+function sc(){return(window.innerWidth<520||window.innerHeight<720)?1.55:2.1;}
 function setSH(){var e=$('stk');document.documentElement.style.setProperty('--sh',((e&&e.offsetHeight)||300)+'px');}
-window.addEventListener('resize',function(){render();});
+window.addEventListener('resize',function(){render(false);});
 function goTo(k){idx=Math.max(0,Math.min(NOTES.length,k));res.length=Math.min(res.length,idx);prev=null;armed=true;hold=0;miss=0;rel=0;lf=-1;ls=0;lg=0;la=true;af=-1;$('hd').style.width='0';render();}
-function advance(q){res[idx]=q||'ok';prev=NOTES[idx].n;idx++;hold=0;miss=0;rel=0;armed=(idx>=NOTES.length)||NOTES[idx].n!==prev;render();}
+function advance(q){res[idx]=q||'ok';prev=NOTES[idx].n;idx++;hold=0;miss=0;rel=0;armed=(idx>=NOTES.length)||NOTES[idx].n!==prev;render(true);}
 
 //YIN-START
 function yin(buf,sr){
-  var W=buf.length>>1,tmin=Math.floor(sr/1100),tmax=Math.min(W-1,Math.floor(sr/380));
+  var W=buf.length>>1,tmin=Math.floor(sr/1250),tmax=Math.min(W-1,Math.floor(sr/380));
   var d=new Float32Array(tmax+1),cm=new Float32Array(tmax+1),t,i,sum=0;
   for(t=1;t<=tmax;t++){var s=0;for(i=0;i<W;i++){var x=buf[i]-buf[i+t];s+=x*x;}d[t]=s;}
   cm[0]=1;
@@ -312,7 +341,7 @@ $('rst').onclick=function(){goTo(0);};
 $('tol').oninput=zone;
 $('rs').onclick=function(){$('tol').value=45;$('sens').value=5;zone();$('sens').oninput();};
 $('sens').oninput=function(){var v=+$('sens').value;$('sv').textContent=v<4?'niska':(v>6?'wysoka':'średnia');};
-buildSong();zone();render();
+buildPicker();var sv0=0;try{sv0=+localStorage.getItem('flet-song')||0;}catch(e){}if(sv0>=SONGS.length)sv0=0;zone();setSong(sv0);
 </script>
 </body>
 </html>
