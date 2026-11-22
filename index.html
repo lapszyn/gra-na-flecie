@@ -176,30 +176,44 @@ var INSTR={
  gitara:{name:'Gitara klasyczna',sub:'Gitara klasyczna (stroje E A D G B E): zagraj dźwięk, a melodia pójdzie dalej',fmin:95,fmax:520,fft:4096,att:true,hold:90,stab:120,div:4}
 };
 var INST='flet';
-function tf(n){return FREQ[n]/INSTR[INST].div;}
-var GNAM=['E','A','D','G','B','E'];
-var GF={C:[1,3],D:[2,0],E:[2,2],F:[2,3],G:[3,0],A:[3,2],B:[4,0],C2:[4,1],D2:[4,3],E2:[5,0],F2:[5,1]};
+var GNAM=['E','A','D','G','B','E'],GOPEN=[40,45,50,55,59,64];
+var BASEM={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+function wmidi(n){var m=/^([A-G])([#b])?(\d)?$/.exec(n);if(!m)return null;return 60+BASEM[m[1]]+(m[2]==='#'?1:(m[2]==='b'?-1:0))+(m[3]?12*(+m[3]-1):0);}
+function gmidi(n){var w=wmidi(n);return w===null?null:w-12;}
+function tf(n){if(INST==='gitara'){var g=gmidi(n);return g===null?0:440*Math.pow(2,(g-69)/12);}return FREQ[n];}
+var GPC={};
+function gpos(n){
+  if(GPC[n])return GPC[n];
+  var m=gmidi(n),best=null,s;
+  for(s=0;s<6;s++){var f=m-GOPEN[s];if(f>=0&&f<=19&&(best===null||f<best[1]))best=[s,f];}
+  return GPC[n]=best||[5,0];
+}
 function guitarSVG(n,s){
-  var g=GF[n],si=g[0],fr=g[1],X0=16,DX=12,Y0=24,DY=24,i,x;
-  var h='<svg width="'+90*s+'" height="'+140*s+'" viewBox="0 0 90 140" aria-hidden="true">'+
-  '<rect x="10" y="'+Y0+'" width="72" height="'+4*DY+'" rx="2" fill="#3A2416"/>'+
-  '<rect x="10" y="'+(Y0-4)+'" width="72" height="5" rx="1.5" fill="#F3EBD7"/>';
-  for(i=1;i<=4;i++)h+='<line x1="10" x2="82" y1="'+(Y0+DY*i)+'" y2="'+(Y0+DY*i)+'" stroke="#B9B2A2" stroke-width="1.3"/>'+
-    '<text x="4.5" y="'+(Y0+DY*(i-0.5)+3)+'" text-anchor="middle" font-size="8" fill="#B7CEC8">'+i+'</text>';
-  var W=[2.2,1.9,1.6,1.2,1,0.8];
-  for(i=0;i<6;i++){x=X0+i*DX;h+='<line x1="'+x+'" x2="'+x+'" y1="'+Y0+'" y2="'+(Y0+4*DY)+'" stroke="'+(i<3?'#C9A66B':'#E7E2D6')+'" stroke-width="'+W[i]+'"/>';}
+  var g=gpos(n),si=g[0],fr=g[1],start=fr<=4?0:fr-1,ROWS=4,X0=16,DX=12,Y0=24,DY=24,i,x,W=90;
+  var h='<svg width="'+W*s+'" height="'+140*s+'" viewBox="0 0 '+W+' 140" aria-hidden="true">'+
+  '<rect x="10" y="'+Y0+'" width="72" height="'+ROWS*DY+'" rx="2" fill="#3A2416"/>';
+  h+=start===0?'<rect x="10" y="'+(Y0-4)+'" width="72" height="5" rx="1.5" fill="#F3EBD7"/>':'<line x1="10" x2="82" y1="'+Y0+'" y2="'+Y0+'" stroke="#B9B2A2" stroke-width="1.3"/>';
+  for(i=1;i<=ROWS;i++){
+    var F=start+i,cy=Y0+DY*(i-0.5);
+    h+='<line x1="10" x2="82" y1="'+(Y0+DY*i)+'" y2="'+(Y0+DY*i)+'" stroke="#B9B2A2" stroke-width="1.3"/>'+
+       '<text x="4.5" y="'+(cy+3)+'" text-anchor="middle" font-size="8" fill="#B7CEC8">'+F+'</text>';
+    if(F===3||F===5||F===7||F===9||F===15)h+='<circle cx="46" cy="'+cy+'" r="3" fill="#6B4A33"/>';
+    if(F===12)h+='<circle cx="34" cy="'+cy+'" r="3" fill="#6B4A33"/><circle cx="58" cy="'+cy+'" r="3" fill="#6B4A33"/>';
+  }
+  var SW=[2.2,1.9,1.6,1.2,1,0.8];
+  for(i=0;i<6;i++){x=X0+i*DX;h+='<line x1="'+x+'" x2="'+x+'" y1="'+Y0+'" y2="'+(Y0+ROWS*DY)+'" stroke="'+(i<3?'#C9A66B':'#E7E2D6')+'" stroke-width="'+SW[i]+'"/>';}
   x=X0+si*DX;
-  h+='<line x1="'+x+'" x2="'+x+'" y1="'+Y0+'" y2="'+(Y0+4*DY)+'" stroke="'+COL[si+1]+'" stroke-width="2.6" opacity="0.85"/>';
+  h+='<line x1="'+x+'" x2="'+x+'" y1="'+Y0+'" y2="'+(Y0+ROWS*DY)+'" stroke="'+COL[si+1]+'" stroke-width="2.6" opacity="0.85"/>';
   if(fr===0)h+='<circle cx="'+x+'" cy="11" r="7.5" fill="'+COL[si+1]+'" stroke="#fff" stroke-width="1.6"/><text x="'+x+'" y="14.5" text-anchor="middle" font-size="10" font-weight="800" fill="#fff">0</text>';
-  else h+='<circle cx="'+x+'" cy="'+(Y0+DY*(fr-0.5))+'" r="9" fill="'+COL[si+1]+'" stroke="#fff" stroke-width="1.8"/><text x="'+x+'" y="'+(Y0+DY*(fr-0.5)+4)+'" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">'+fr+'</text>';
-  for(i=0;i<6;i++)h+='<text x="'+(X0+i*DX)+'" y="'+(Y0+4*DY+17)+'" text-anchor="middle" font-size="10" font-weight="'+(i===si?800:500)+'" fill="'+(i===si?'#fff':'#8FAEA6')+'">'+GNAM[i]+'</text>';
+  else{var r=fr-start,fg=start===0?fr:r,cy2=Y0+DY*(r-0.5);h+='<circle cx="'+x+'" cy="'+cy2+'" r="9" fill="'+COL[si+1]+'" stroke="#fff" stroke-width="1.8"/><text x="'+x+'" y="'+(cy2+4)+'" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">'+fg+'</text>';}
+  for(i=0;i<6;i++)h+='<text x="'+(X0+i*DX)+'" y="'+(Y0+ROWS*DY+17)+'" text-anchor="middle" font-size="10" font-weight="'+(i===si?800:500)+'" fill="'+(i===si?'#fff':'#8FAEA6')+'">'+GNAM[i]+'</text>';
   return h+'</svg>';
 }
 function fing(n,s){return INST==='gitara'?guitarSVG(n,s*0.95):fluteSVG(n,s);}
-function guitarDesc(n){var g=GF[n];return 'struna '+(6-g[0])+' ('+GNAM[g[0]]+') · '+(g[1]===0?'pusta, bez palca':'próg '+g[1]+' · palec '+g[1]);}
+function guitarDesc(n){var g=gpos(n),f=g[1];return 'struna '+(6-g[0])+' ('+GNAM[g[0]]+') · '+(f===0?'pusta, bez palca':(f<=4?'próg '+f+' · palec '+f:'próg '+f+' · palec 1 (przesuń rękę wyżej)'));}
 
 function fluteSVG(n,s){
-  var f=FING[n];
+  var f=FING[n];if(!f)return '<div class="gd">brak chwytu fletowego dla tego dźwięku</div>';
   var h='<svg width="'+40*s+'" height="'+143*s+'" viewBox="0 -9 40 143" aria-hidden="true">'+
   '<path d="M15 -8h10l2 9H13z" fill="#8C5A2B"/>'+
   '<rect x="8" y="1" width="24" height="125" rx="3" fill="#E4B97E" stroke="#B88445" stroke-width="0.9"/>'+
