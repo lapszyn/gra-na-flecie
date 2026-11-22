@@ -60,6 +60,9 @@ button.p.on{background:transparent;color:var(--berry)}
 .pick{padding:14px 16px}
 .pk{font-weight:600;margin:0 0 10px}
 .pills{display:flex;flex-wrap:wrap;gap:8px}
+.gd{font-size:13px;color:#B7CEC8;margin-top:6px;min-height:1.3em}
+.gd:empty{min-height:0}
+.pk2{margin-top:16px}
 .hint{margin:10px 0 0;font-size:13px;opacity:.75}
 .hint:empty{display:none}
 .pill{min-height:44px;padding:0 18px;border-radius:22px;font-size:15px}
@@ -119,17 +122,17 @@ details[open] summary::after{content:"–"}
 <body>
 <div class="w">
 <header>
-<div><h1 id="ttl">Jingle Bells</h1><p class="sub">Flet sopranowy C: zagraj dźwięk, a melodia pójdzie dalej</p></div>
+<div><h1 id="ttl">Jingle Bells</h1><p class="sub" id="sub">Flet sopranowy C: zagraj dźwięk, a melodia pójdzie dalej</p></div>
 <button class="p" id="go">Włącz mikrofon</button>
 </header>
 <div class="err" id="er" role="alert"></div>
-<section class="card pick"><p class="pk">Wybierz piosenkę</p><div class="pills" id="songs" role="radiogroup" aria-label="Piosenka"></div><p class="hint" id="sh"></p></section>
+<section class="card pick"><p class="pk">Instrument</p><div class="pills" id="insts" role="radiogroup" aria-label="Instrument"></div><p class="pk pk2">Piosenka</p><div class="pills" id="songs" role="radiogroup" aria-label="Piosenka"></div><p class="hint" id="sh"></p></section>
 <div class="stk" id="stk">
 <div class="stg">
 <div id="fl"></div>
 <div class="rt">
 <div class="top">
-<div class="big"><div class="letter" id="let">–</div><div class="syl" id="syl"></div></div>
+<div class="big"><div class="letter" id="let">–</div><div class="syl" id="syl"></div><div class="gd" id="gd"></div></div>
 <div class="nx">dalej<div class="l" id="nxl"></div><div id="nxf"></div></div>
 </div>
 <div class="st" id="st" aria-live="polite">Mikrofon wyłączony</div>
@@ -168,6 +171,32 @@ var FING={C:'11111111',D:'11111110',E:'11111100',F:'11111011',G:'11110000',A:'11
 var FREQ={C:523.25,D:587.33,E:659.26,F:698.46,G:783.99,A:880,B:987.77,C2:1046.5,D2:1174.66,E2:1318.51,F2:1396.91};
 var Y8=[8,25,38,51,76,89,102,115];
 function dn(n){return n.replace('2',"'");}
+var INSTR={
+ flet:{name:'Flet sopranowy',sub:'Flet sopranowy C: zagraj dźwięk, a melodia pójdzie dalej',fmin:380,fmax:1500,fft:2048,att:false,hold:120,stab:150,div:1},
+ gitara:{name:'Gitara klasyczna',sub:'Gitara klasyczna (stroje E A D G B E): zagraj dźwięk, a melodia pójdzie dalej',fmin:95,fmax:520,fft:4096,att:true,hold:90,stab:120,div:4}
+};
+var INST='flet';
+function tf(n){return FREQ[n]/INSTR[INST].div;}
+var GNAM=['E','A','D','G','B','E'];
+var GF={C:[1,3],D:[2,0],E:[2,2],F:[2,3],G:[3,0],A:[3,2],B:[4,0],C2:[4,1],D2:[4,3],E2:[5,0],F2:[5,1]};
+function guitarSVG(n,s){
+  var g=GF[n],si=g[0],fr=g[1],X0=16,DX=12,Y0=24,DY=24,i,x;
+  var h='<svg width="'+90*s+'" height="'+140*s+'" viewBox="0 0 90 140" aria-hidden="true">'+
+  '<rect x="10" y="'+Y0+'" width="72" height="'+4*DY+'" rx="2" fill="#3A2416"/>'+
+  '<rect x="10" y="'+(Y0-4)+'" width="72" height="5" rx="1.5" fill="#F3EBD7"/>';
+  for(i=1;i<=4;i++)h+='<line x1="10" x2="82" y1="'+(Y0+DY*i)+'" y2="'+(Y0+DY*i)+'" stroke="#B9B2A2" stroke-width="1.3"/>'+
+    '<text x="4.5" y="'+(Y0+DY*(i-0.5)+3)+'" text-anchor="middle" font-size="8" fill="#B7CEC8">'+i+'</text>';
+  var W=[2.2,1.9,1.6,1.2,1,0.8];
+  for(i=0;i<6;i++){x=X0+i*DX;h+='<line x1="'+x+'" x2="'+x+'" y1="'+Y0+'" y2="'+(Y0+4*DY)+'" stroke="'+(i<3?'#C9A66B':'#E7E2D6')+'" stroke-width="'+W[i]+'"/>';}
+  x=X0+si*DX;
+  h+='<line x1="'+x+'" x2="'+x+'" y1="'+Y0+'" y2="'+(Y0+4*DY)+'" stroke="'+COL[si+1]+'" stroke-width="2.6" opacity="0.85"/>';
+  if(fr===0)h+='<circle cx="'+x+'" cy="11" r="7.5" fill="'+COL[si+1]+'" stroke="#fff" stroke-width="1.6"/><text x="'+x+'" y="14.5" text-anchor="middle" font-size="10" font-weight="800" fill="#fff">0</text>';
+  else h+='<circle cx="'+x+'" cy="'+(Y0+DY*(fr-0.5))+'" r="9" fill="'+COL[si+1]+'" stroke="#fff" stroke-width="1.8"/><text x="'+x+'" y="'+(Y0+DY*(fr-0.5)+4)+'" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">'+fr+'</text>';
+  for(i=0;i<6;i++)h+='<text x="'+(X0+i*DX)+'" y="'+(Y0+4*DY+17)+'" text-anchor="middle" font-size="10" font-weight="'+(i===si?800:500)+'" fill="'+(i===si?'#fff':'#8FAEA6')+'">'+GNAM[i]+'</text>';
+  return h+'</svg>';
+}
+function fing(n,s){return INST==='gitara'?guitarSVG(n,s*0.95):fluteSVG(n,s);}
+function guitarDesc(n){var g=GF[n];return 'struna '+(6-g[0])+' ('+GNAM[g[0]]+') · '+(g[1]===0?'pusta, bez palca':'próg '+g[1]+' · palec '+g[1]);}
 
 function fluteSVG(n,s){
   var f=FING[n];
@@ -222,10 +251,39 @@ var PH=[],NOTES=[],PI=[],curSong=0;
 function setSong(k){
   curSong=k;PH=SONGS[k].phrases;NOTES=[];PI=[];
   PH.forEach(function(p,pi){var a=p[1].split(' '),b=p[2].split(' ');PI.push([]);a.forEach(function(n,i){PI[pi].push(NOTES.length);NOTES.push({n:n,s:b[i]||'',p:pi});});});
-  $('ttl').textContent=SONGS[k].title;$('sh').textContent=SONGS[k].hint||'';document.title=SONGS[k].title+' – nauka na flecie sopranowym';
-  var pills=document.querySelectorAll('.pill');for(var i=0;i<pills.length;i++)pills[i].setAttribute('aria-checked',i===k?'true':'false');
+  $('ttl').textContent=SONGS[k].title;updHint();
+  var pills=document.querySelectorAll('#songs .pill');for(var i=0;i<pills.length;i++)pills[i].setAttribute('aria-checked',i===k?'true':'false');
   try{localStorage.setItem('flet-song',String(k));}catch(e){}
   buildSong();goTo(0);
+}
+function updHint(){
+  document.title=(SONGS[curSong]?SONGS[curSong].title+' – ':'')+'nauka: '+INSTR[INST].name.toLowerCase();
+  $('sh').textContent=INST==='gitara'?'Gitara brzmi dwie oktawy niżej niż flet, ale melodia jest ta sama. Wszystkie dźwięki zagrasz w pierwszej pozycji (progi 0–3).':(SONGS[curSong]&&SONGS[curSong].hint||'');
+}
+function buildLegend(){
+  var l='',i;
+  if(INST==='gitara'){
+    for(i=5;i>=0;i--)l+='<span><i style="background:'+COL[i+1]+'"></i>struna '+(6-i)+' ('+GNAM[i]+')</span>';
+    l+='<span>Cyfra w kółku to palec lewej ręki: 1 wskazujący, 2 środkowy, 3 serdeczny. Kółko z zerem nad siodełkiem oznacza strunę pustą.</span>';
+  }else{
+    for(i=0;i<8;i++)l+='<span><i style="background:'+COL[i]+'"></i>'+i+' '+NAM[i]+'</span>';
+    l+='<span><i style="background:linear-gradient(90deg,#888780 50%,#1c1008 50%)"></i>½ kciuk lekko uchylony (wysokie E\' i F\')</span>';
+  }
+  $('lg').innerHTML=l;
+}
+function applyInst(){
+  var c=INSTR[INST],pills=document.querySelectorAll('#insts .pill'),i;
+  for(i=0;i<pills.length;i++)pills[i].setAttribute('aria-checked',pills[i].getAttribute('data-i')===INST?'true':'false');
+  $('sub').textContent=c.sub;
+  if(an){an.fftSize=c.fft;buf=new Float32Array(an.fftSize);nb=new Float32Array(an.fftSize);}
+  hist=[];lastAtk=-1e9;
+  buildLegend();updHint();
+  try{localStorage.setItem('flet-inst',INST);}catch(e){}
+}
+function buildInsts(){
+  var h='';for(var k in INSTR)h+='<button type="button" class="pill" role="radio" aria-checked="false" data-i="'+k+'">'+INSTR[k].name+'</button>';
+  $('insts').innerHTML=h;
+  $('insts').onclick=function(e){var b=e.target.closest('.pill');if(b){INST=b.getAttribute('data-i');applyInst();goTo(idx);}};
 }
 function buildPicker(){
   var h='';SONGS.forEach(function(sg,i){h+='<button type="button" class="pill" role="radio" aria-checked="false" data-s="'+i+'">'+sg.title+'</button>';});
@@ -252,19 +310,17 @@ function buildSong(){
   $('song').innerHTML=h;
   $('song').onclick=function(e){var c=e.target.closest('.chip');if(c){goTo(+c.getAttribute('data-k'));}};
   $('song').onkeydown=function(e){if(e.key==='Enter'||e.key===' '){var c=e.target.closest('.chip');if(c){e.preventDefault();goTo(+c.getAttribute('data-k'));}}};
-  var l='';for(var i=0;i<8;i++)l+='<span><i style="background:'+COL[i]+'"></i>'+i+' '+NAM[i]+'</span>';
-  l+='<span><i style="background:linear-gradient(90deg,#888780 50%,#1c1008 50%)"></i>½ kciuk lekko uchylony (wysokie E\' i F\')</span>';
-  $('lg').innerHTML=l;
+  buildLegend();
 }
 function render(doScroll){
   var chips=document.querySelectorAll('.chip');
   for(var i=0;i<chips.length;i++){var k=+chips[i].getAttribute('data-k');chips[i].className='chip'+(k<idx?' d'+(res[k]=='near'?' n':(res[k]=='off'?' o':'')):(k==idx?' c':''));}
-  if(idx>=NOTES.length){$('fl').innerHTML='';$('let').textContent='✓';$('syl').textContent='Brawo! Cała piosenka zagrana';$('nxl').textContent='';$('nxf').innerHTML='';}
+  if(idx>=NOTES.length){$('fl').innerHTML='';$('let').textContent='✓';$('syl').textContent='Brawo! Cała piosenka zagrana';$('nxl').textContent='';$('nxf').innerHTML='';$('gd').textContent='';}
   else{
     var n=NOTES[idx],c=sc();
-    $('fl').innerHTML=fluteSVG(n.n,c);
+    $('fl').innerHTML=fing(n.n,c);$('gd').textContent=INST==='gitara'?guitarDesc(n.n):'';
     $('let').textContent=dn(n.n);$('syl').textContent=n.s;
-    if(idx+1<NOTES.length){$('nxl').textContent=dn(NOTES[idx+1].n);$('nxf').innerHTML=fluteSVG(NOTES[idx+1].n,c*0.4);}else{$('nxl').textContent='koniec';$('nxf').innerHTML='';}
+    if(idx+1<NOTES.length){$('nxl').textContent=dn(NOTES[idx+1].n);$('nxf').innerHTML=fing(NOTES[idx+1].n,c*(INST==='gitara'?0.55:0.4));}else{$('nxl').textContent='koniec';$('nxf').innerHTML='';}
   }
   setSH();
   var cur=document.querySelector('.chip.c');
@@ -277,8 +333,9 @@ function goTo(k){idx=Math.max(0,Math.min(NOTES.length,k));res.length=Math.min(re
 function advance(q){res[idx]=q||'ok';prev=NOTES[idx].n;idx++;hold=0;miss=0;rel=0;armed=(idx>=NOTES.length)||NOTES[idx].n!==prev;render(true);}
 
 //YIN-START
-function yin(buf,sr){
-  var W=buf.length>>1,tmin=Math.floor(sr/1500),tmax=Math.min(W-1,Math.floor(sr/380));
+function yin(buf,sr,fmin,fmax){
+  fmin=fmin||380;fmax=fmax||1500;
+  var W=buf.length>>1,tmin=Math.floor(sr/fmax),tmax=Math.min(W-1,Math.floor(sr/fmin));
   var d=new Float32Array(tmax+1),cm=new Float32Array(tmax+1),t,i,sum=0;
   for(t=1;t<=tmax;t++){var s=0;for(i=0;i<W;i++){var x=buf[i]-buf[i+t];s+=x*x;}d[t]=s;}
   cm[0]=1;
@@ -298,7 +355,7 @@ function rmsOf(buf){var s=0;for(var i=0;i<buf.length;i++)s+=buf[i]*buf[i];return
 var ctx=null,an=null,buf=null,running=false,lastT=0;
 var NN=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 function noteName(f){var m=Math.round(69+12*Math.log2(f/440));return NN[((m%12)+12)%12]+(Math.floor(m/12)-1);}
-var noise=0.003,calMs=0,calSum=0,calN=0,nb=null;
+var noise=0.003,calMs=0,calSum=0,calN=0,nb=null,hist=[],lastAtk=-1e9;
 function thr(){return Math.max(0.0025,noise*3)*Math.pow(0.6,(+$('sens').value)-5);}
 
 function loop(t){
@@ -309,28 +366,31 @@ function loop(t){
   var r=rmsOf(buf);
   $('lv').style.width=Math.min(100,r*1200)+'%';
   if(calMs<800){calMs+=dt;calSum+=r;calN++;noise=Math.min(0.02,calSum/calN);$('st').textContent='Kalibracja szumu… bądź cicho';return;}
-  var f=-1,T=thr();
-  if(r>T){var mx=0,i;for(i=0;i<buf.length;i++){var a=Math.abs(buf[i]);if(a>mx)mx=a;}var g=mx>0?Math.min(100,0.5/mx):1;for(i=0;i<buf.length;i++)nb[i]=buf[i]*g;f=yin(nb,ctx.sampleRate);}
+  var f=-1,T=thr(),IC=INSTR[INST],atk=false;
+  hist.push({t:t,r:r});while(hist.length>1&&t-hist[0].t>160)hist.shift();
+  if(IC.att&&r>T&&t-lastAtk>220&&t-hist[0].t>=90&&r>hist[0].r*1.5){atk=true;lastAtk=t;}
+  if(r>T){var mx=0,i;for(i=0;i<buf.length;i++){var a=Math.abs(buf[i]);if(a>mx)mx=a;}var g=mx>0?Math.min(100,0.5/mx):1;for(i=0;i<buf.length;i++)nb[i]=buf[i]*g;f=yin(nb,ctx.sampleRate,INSTR[INST].fmin,INSTR[INST].fmax);}
   $('dbg').textContent='poziom '+r.toFixed(4)+' / próg '+T.toFixed(4)+' / '+(f>0?Math.round(f)+' Hz':'brak tonu');
   var tol=+$('tol').value;
   var st=$('st');
   if(f<0){st.innerHTML='Słucham… <b>(cisza)</b>';$('nd').style.left='50%';}
   if(idx>=NOTES.length){return;}
   var learnOn=$('learn').checked;
-  var target=FREQ[NOTES[idx].n],cents=null,match=false,oc=0;
+  var target=tf(NOTES[idx].n),cents=null,match=false,oc=0;
   if(f>0){cents=1200*Math.log2(f/target);
     oc=cents-1200*Math.round(cents/1200);
     var near=Math.abs(oc)<=tol;cents=oc;
     st.innerHTML='Słyszę: <b>'+noteName(f)+'</b> ('+Math.round(f)+' Hz) · '+(near?'<b>dobrze</b>':(cents<0?'za nisko':'za wysoko'));
     $('nd').style.left=(50+Math.max(-60,Math.min(60,cents))/120*100)+'%';
     match=near;}
+  if(atk){if(learnOn){lf=-1;ls=0;la=true;af=-1;}else if(!armed){armed=true;rel=0;hold=0;}}
   if(learnOn){
     if(f>0){
       if(lf>0&&Math.abs(1200*Math.log2(f/lf))<70)ls+=dt;else ls=0;
       lf=f;lg=0;
       var diff=af>0?Math.abs(1200*Math.log2(f/af)):999;
-      $('hd').style.width=Math.min(100,ls/150*100)+'%';
-      if(ls>=150&&(la||diff>90)){
+      $('hd').style.width=Math.min(100,ls/IC.stab*100)+'%';
+      if(ls>=IC.stab&&(la||diff>90)){
         var q=Math.abs(oc)<=tol?'ok':(Math.abs(oc)<=150?'near':'off');
         $('fb').textContent=NOTES[idx].n+': '+(q=='ok'?'dobrze':(q=='near'?'prawie, blisko':'inny dźwięk niż w melodii'))+' · idę dalej';
         af=f;la=false;ls=0;advance(q);
@@ -340,8 +400,8 @@ function loop(t){
   }
   if(!armed){if(!match){rel+=dt;if(rel>=70){armed=true;rel=0;}}else rel=0;}
   if(armed&&match){hold+=dt;miss=0;}else{miss+=dt;if(miss>60)hold=0;}
-  $('hd').style.width=Math.min(100,hold/120*100)+'%';
-  if(armed&&hold>=120)advance('ok');
+  $('hd').style.width=Math.min(100,hold/IC.hold*100)+'%';
+  if(armed&&hold>=IC.hold)advance('ok');
 }
 function zone(){var tol=+$('tol').value;var w=tol/120*100;$('zone').style.left=(50-w)+'%';$('zone').style.width=(2*w)+'%';$('tv').textContent=tol;}
 
@@ -354,7 +414,7 @@ $('go').onclick=function(){
   if(inFrame){$('er').innerHTML='Strona jest otwarta w ramce (np. podglądzie w aplikacji), gdzie mikrofon jest zablokowany. Otwórz plik bezpośrednio w przeglądarce.<br><small>'+info+'</small>';}
   navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}).then(function(s){
     ctx=new (window.AudioContext||window.webkitAudioContext)();
-    var src=ctx.createMediaStreamSource(s);an=ctx.createAnalyser();an.fftSize=2048;buf=new Float32Array(an.fftSize);nb=new Float32Array(an.fftSize);calMs=0;calSum=0;calN=0;src.connect(an);
+    var src=ctx.createMediaStreamSource(s);an=ctx.createAnalyser();an.fftSize=INSTR[INST].fft;buf=new Float32Array(an.fftSize);nb=new Float32Array(an.fftSize);calMs=0;calSum=0;calN=0;hist=[];lastAtk=-1e9;src.connect(an);
     running=true;lastT=performance.now();$('go').textContent='Wyłącz mikrofon';$('go').classList.add('on');$('st').textContent='Słucham…';requestAnimationFrame(loop);
   }).catch(function(e){
     var n=e&&e.name||'błąd',msg={NotAllowedError:'Mikrofon zablokowany. Albo odmówiono zgody, albo przeglądarka/ramka zabrania dostępu bez pytania. Kliknij ikonę kłódki przy adresie i zezwól na mikrofon, albo otwórz plik bezpośrednio w Chrome.',NotFoundError:'Nie znaleziono żadnego mikrofonu.',NotReadableError:'Mikrofon jest zajęty przez inną aplikację.',SecurityError:'Przeglądarka zabrania mikrofonu w tym kontekście (potrzebny https lub Chrome z lokalnego pliku).'}[n]||'Nie udało się włączyć mikrofonu.';
@@ -367,7 +427,7 @@ $('rst').onclick=function(){goTo(0);};
 $('tol').oninput=zone;
 $('rs').onclick=function(){$('tol').value=45;$('sens').value=5;zone();$('sens').oninput();};
 $('sens').oninput=function(){var v=+$('sens').value;$('sv').textContent=v<4?'niska':(v>6?'wysoka':'średnia');};
-buildPicker();var sv0=0;try{sv0=+localStorage.getItem('flet-song')||0;}catch(e){}if(sv0>=SONGS.length)sv0=0;zone();setSong(sv0);
+buildInsts();buildPicker();var sv0=0;try{sv0=+localStorage.getItem('flet-song')||0;var si0=localStorage.getItem('flet-inst');if(si0&&INSTR[si0])INST=si0;}catch(e){}if(sv0>=SONGS.length)sv0=0;zone();applyInst();setSong(sv0);
 </script>
 </body>
 </html>
