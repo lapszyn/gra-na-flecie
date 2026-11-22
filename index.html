@@ -117,6 +117,37 @@ details[open] summary::after{content:"–"}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 .chip{scroll-margin-top:calc(var(--sh,300px) + 16px);scroll-margin-bottom:12px}
+.lc,.rc{display:contents}
+.lc{display:contents}
+.cols{display:block}
+/* Układ adaptacyjny: szerokie ekrany i telefony w poziomie */
+@media (min-width:880px),(orientation:landscape) and (max-height:520px) and (min-width:600px){
+  .w{max-width:1200px;padding:20px 28px 40px}
+  header{margin-bottom:16px}
+  .pick{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;align-items:center;padding:12px 16px}
+  .pick .pk,.pick .pk2{margin:0}
+  .pick .hint{grid-column:1/-1;margin:0}
+  .cols{display:grid;grid-template-columns:minmax(340px,440px) minmax(0,1fr);gap:24px;align-items:start}
+  .lc{display:block;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto;overflow-x:hidden;padding:2px 2px 6px;scrollbar-width:thin}
+  .rc{display:block;min-width:0}
+  .lc .stk{position:static;margin-bottom:12px}
+  .chip{scroll-margin-top:20px;scroll-margin-bottom:20px}
+}
+@media (orientation:landscape) and (max-height:520px) and (min-width:600px){
+  .cols{grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:16px}
+  header{margin-bottom:8px}
+  header .sub{display:none}
+  .pick{display:flex;flex-wrap:wrap;gap:6px 18px;padding:8px 12px}
+  .pick .pk,.pick .hint{display:none}
+  .pick .pills{gap:6px}
+  .pill{min-height:36px;padding:0 14px;font-size:14px}
+  .w{padding:12px 16px 24px}
+  h1{font-size:26px}
+  .stk{padding:12px 12px 10px;border-radius:16px}
+  .letter{font-size:56px}
+  .tg{padding:8px 12px}
+  .tg span.t{display:none}
+}
 </style>
 </head>
 <body>
@@ -127,6 +158,7 @@ details[open] summary::after{content:"–"}
 </header>
 <div class="err" id="er" role="alert"></div>
 <section class="card pick"><p class="pk">Instrument</p><div class="pills" id="insts" role="radiogroup" aria-label="Instrument"></div><p class="pk pk2">Piosenka</p><div class="pills" id="songs" role="radiogroup" aria-label="Piosenka"></div><p class="hint" id="sh"></p></section>
+<div class="cols"><div class="lc">
 <div class="stk" id="stk">
 <div class="stg">
 <div id="fl"></div>
@@ -149,6 +181,8 @@ details[open] summary::after{content:"–"}
 <button id="rst" type="button">Od początku</button>
 </div>
 <label class="tg"><input type="checkbox" id="learn"><span class="sw"></span><span><b>Tryb nauki</b><span class="t">Idę dalej po każdym zagranym dźwięku, nawet gdy nie trafisz. Zielone: dobrze, żółte: prawie, przerywane: inny dźwięk.</span></span></label>
+</div>
+<div class="rc">
 <section class="card"><div class="lg" id="lg"></div></section>
 <section class="card song" id="song"></section>
 <details class="card">
@@ -160,9 +194,10 @@ details[open] summary::after{content:"–"}
 </div>
 <button id="rs" type="button">Przywróć domyślne ustawienia</button>
 <div class="dbg" id="dbg"></div>
-<p class="sub">Flet sopranowy brzmi o oktawę wyżej niż zapis: C = 523 Hz, D = 587 Hz, E = 659 Hz, F = 698 Hz, G = 784 Hz. Dwa takie same dźwięki z rzędu rozdziel krótką przerwą w dmuchaniu.</p>
+<p class="sub" id="note"></p>
 </div>
 </details>
+</div></div>
 </div>
 <script>
 var COL=['#888780','#7F77DD','#378ADD','#1D9E75','#639922','#BA7517','#D85A30','#D4537E'];
@@ -292,6 +327,7 @@ function applyInst(){
   if(an){an.fftSize=c.fft;buf=new Float32Array(an.fftSize);nb=new Float32Array(an.fftSize);}
   hist=[];lastAtk=-1e9;
   buildLegend();updHint();
+  $('note').textContent=INST==='gitara'?'Gitara klasyczna brzmi oktawę niżej niż zapis nutowy, więc melodie są o dwie oktawy niżej niż we flecie: C = 131 Hz, D = 147 Hz, E = 165 Hz, F = 175 Hz, G = 196 Hz. Dwa takie same dźwięki z rzędu: szarpnij strunę jeszcze raz, nie wyciszaj jej.':'Flet sopranowy brzmi o oktawę wyżej niż zapis: C = 523 Hz, D = 587 Hz, E = 659 Hz, F = 698 Hz, G = 784 Hz. Dwa takie same dźwięki z rzędu rozdziel krótką przerwą w dmuchaniu.';
   try{localStorage.setItem('flet-inst',INST);}catch(e){}
 }
 function buildInsts(){
@@ -340,7 +376,12 @@ function render(doScroll){
   var cur=document.querySelector('.chip.c');
   if(doScroll===true&&cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
-function sc(){return(window.innerWidth<520||window.innerHeight<720)?1.55:2.1;}
+function sc(){
+  var w=window.innerWidth,h=window.innerHeight;
+  if(w>=600&&h<=520)return 1.0;
+  if(w>=880)return h>=780?2.3:(h>=640?1.85:1.5);
+  return(w<520||h<720)?1.55:2.1;
+}
 function setSH(){var e=$('stk');document.documentElement.style.setProperty('--sh',((e&&e.offsetHeight)||300)+'px');}
 window.addEventListener('resize',function(){render(false);});
 function goTo(k){idx=Math.max(0,Math.min(NOTES.length,k));res.length=Math.min(res.length,idx);prev=null;armed=true;hold=0;miss=0;rel=0;lf=-1;ls=0;lg=0;la=true;af=-1;$('hd').style.width='0';render();}
